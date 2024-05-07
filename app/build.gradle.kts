@@ -117,4 +117,7 @@ dependencies {
     val koinAndroidVersion = "3.5.0"
     implementation("io.insert-koin:koin-android:$koinAndroidVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinAndroidVersion")
+
+    //Accompanist
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.4-beta")
 }
