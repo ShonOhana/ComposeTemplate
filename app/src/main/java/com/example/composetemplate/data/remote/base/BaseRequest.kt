@@ -1,4 +1,4 @@
-package com.example.composetemplate.data.remote
+package com.example.composetemplate.data.remote.base
 
 import io.ktor.http.HttpMethod
 

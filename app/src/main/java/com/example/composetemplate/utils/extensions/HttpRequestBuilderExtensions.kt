@@ -1,6 +1,6 @@
 package com.example.composetemplate.utils.extensions
 
-import com.example.composetemplate.data.remote.BaseRequest
+import com.example.composetemplate.data.remote.base.BaseRequest
 import com.example.composetemplate.utils.Constants
 import io.ktor.client.plugins.timeout
 import io.ktor.client.request.HttpRequestBuilder

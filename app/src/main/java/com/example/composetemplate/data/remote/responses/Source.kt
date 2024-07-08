@@ -1,4 +1,4 @@
-package com.example.composetemplate
+package com.example.composetemplate.data.remote.responses
 
 import kotlinx.serialization.Serializable
 

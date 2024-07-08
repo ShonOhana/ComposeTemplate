@@ -1,6 +1,5 @@
 package com.example.composetemplate.data.remote.responses
 
-import com.example.composetemplate.Source
 import kotlinx.serialization.Serializable
 
 /** Here is an example of a base server response.

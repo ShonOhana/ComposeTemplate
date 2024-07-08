@@ -1,7 +1,5 @@
 package com.example.composetemplate.data.remote.base
 
-import com.example.composetemplate.data.remote.BaseRequest
-import com.example.composetemplate.data.remote.BaseServerClient
 import com.example.composetemplate.utils.LogsManager
 import com.example.composetemplate.utils.extensions.buildRequest
 import com.example.composetemplate.utils.extensions.handleErrors

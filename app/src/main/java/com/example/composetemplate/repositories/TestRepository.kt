@@ -1,9 +1,9 @@
-package com.example.composetemplate
+package com.example.composetemplate.repositories
 
 import com.example.composetemplate.data.remote.requests.ExampleRequests
 import com.example.composetemplate.data.remote.responses.ExampleResponse
-import com.example.composetemplate.database.dao.TestDao
-import com.example.composetemplate.database.model.Test
+import com.example.composetemplate.data.local.dao.TestDao
+import com.example.composetemplate.data.local.db_models.Test
 import com.example.composetemplate.managers.NetworkManager
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
@@ -15,8 +15,8 @@ class TestRepository(private val networkManager: NetworkManager, private val tes
     fun getData(): Flow<ExampleResponse?> {
         return flow {
             (networkManager.sendRequest(ExampleRequests.ExampleRequest()) as? HttpResponse)?.let { response ->
-                emit( response.body<ExampleResponse>())
-            }?:run {
+                emit(response.body<ExampleResponse>())
+            } ?: run {
                 emit(null)
             }
         }

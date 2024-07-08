@@ -1,7 +1,7 @@
 package com.example.composetemplate.di
 
-import com.example.composetemplate.database.dao.TestDao
-import com.example.composetemplate.database.local.AppDatabase
+import com.example.composetemplate.data.local.dao.TestDao
+import com.example.composetemplate.data.local.AppDatabase
 import org.koin.dsl.module
 
 

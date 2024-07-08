@@ -1,11 +1,11 @@
-package com.example.composetemplate.database.local
+package com.example.composetemplate.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.composetemplate.database.dao.TestDao
-import com.example.composetemplate.database.model.Test
+import com.example.composetemplate.data.local.dao.TestDao
+import com.example.composetemplate.data.local.db_models.Test
 
 /**
  * This interface will provide us the database we create.

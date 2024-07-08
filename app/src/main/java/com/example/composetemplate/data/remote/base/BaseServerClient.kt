@@ -1,6 +1,5 @@
-package com.example.composetemplate.data.remote
+package com.example.composetemplate.data.remote.base
 
-import com.example.composetemplate.data.remote.BaseRequest
 import io.ktor.client.HttpClient
 
 /**
