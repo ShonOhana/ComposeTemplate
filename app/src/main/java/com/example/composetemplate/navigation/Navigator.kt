@@ -27,27 +27,27 @@ class Navigator {
     /**
      * Navigates to a specified route and handles the back stack accordingly.
      *
-     * @param route The destination route to navigate to.
+     * @param navigableScreen The destination route to navigate to.
      */
-    fun navigate(route: Route) {
+    fun navigate(navigableScreen: NavigableScreen) {
 
-        when(route.route){
-            NavigationRoute.Authentication -> {
-                navHostController.navigate(route){
+        when(navigableScreen.screen){
+            AppScreen.Authentication -> {
+                navHostController.navigate(navigableScreen){
                     /* When the app navigates from the splash screen to authentication screen,
                      * we want to the remove the splash screen (startDestinationId) from the back stack */
                     popUpTo(navHostController.graph.startDestinationId){inclusive = true}
                 }
             }
-            NavigationRoute.Home -> {
+            AppScreen.Home -> {
                 /* When the app navigates to the home screen we want to remove all the EntryGraph from the back stack */
-                navigateAndRemoveGraph<Graphs.EntryGraph>(route)
+                navigateAndRemoveGraph<EntryGraph>(navigableScreen)
             }
-            NavigationRoute.Splash,
-            NavigationRoute.Advertisement,
-            NavigationRoute.Favorites ->
+            AppScreen.Splash,
+            AppScreen.Advertisement,
+            AppScreen.Favorites ->
                 /* Simply navigate to the specified route without altering the back stack. */
-                navHostController.navigate(route)
+                navHostController.navigate(navigableScreen)
         }
     }
 
@@ -58,10 +58,10 @@ class Navigator {
      * graph to prevent users from navigating back to it.
      *
      * @param T The type of the graph to be removed.
-     * @param route The destination route to navigate to.
+     * @param navigableScreen The destination route to navigate to.
      */
-    private inline fun <reified T : Graph>navigateAndRemoveGraph(route: Route){
-        navHostController.navigate(route){
+    private inline fun <reified T : Graph>navigateAndRemoveGraph(navigableScreen: NavigableScreen){
+        navHostController.navigate(navigableScreen){
             popUpTo<T>{
                 inclusive = true
             }

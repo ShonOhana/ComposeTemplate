@@ -1,8 +1,6 @@
 package com.example.composetemplate.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewModelScope
-
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -16,7 +14,6 @@ import com.example.composetemplate.presentation.screens.entry_screens.SplashScre
 import com.example.composetemplate.presentation.screens.main_screens.HomeScreen
 import com.example.composetemplate.presentation.screens.main_screens.FavoritesScreen
 import com.example.composetemplate.utils.extensions.sharedViewModel
-import kotlinx.coroutines.launch
 
 /**
  * RootNavHost is a composable function that sets up the main navigation host for the application.
@@ -36,7 +33,7 @@ fun RootNavHost(
 ) {
 
     /* The root navigation graph. The parent of all the sub-navigation graphs */
-    NavHost(navController = navHostController, startDestination = Graphs.EntryGraph) {
+    NavHost(navController = navHostController, startDestination = EntryGraph) {
         entryNavGraph(navigator = navigator)
         mainNavGraph(navigator = navigator)
     }
@@ -53,15 +50,15 @@ fun RootNavHost(
 fun NavGraphBuilder.entryNavGraph(
     navigator: Navigator
 ) {
-    navigation<Graphs.EntryGraph>(startDestination = EntryRoute.Splash) {
-        composable<EntryRoute.Splash> { SplashScreen(navigator) }
-        composable<EntryRoute.Authentication> {
+    navigation<EntryGraph>(startDestination = EntryScreens.Splash) {
+        composable<EntryScreens.Splash> { SplashScreen(navigator) }
+        composable<EntryScreens.Authentication> {
             /* Authentication is a data class that contains arguments.
              * Here is an example for getting the data from the route and passing it to the screen composable function. */
-            val args = it.toRoute<EntryRoute.Authentication>()
+            val args = it.toRoute<EntryScreens.Authentication>()
             AuthenticationScreen(args, navigator)
         }
-        composable<EntryRoute.Advertisement> { AdvertisementScreen(navigator) }
+        composable<EntryScreens.Advertisement> { AdvertisementScreen(navigator) }
     }
 }
 
@@ -75,13 +72,12 @@ fun NavGraphBuilder.entryNavGraph(
 fun NavGraphBuilder.mainNavGraph(
     navigator: Navigator
 ) {
-    navigation<Graphs.MainGraph>(startDestination = MainRoute.Home) {
-        composable<MainRoute.Home> { entry ->
+    navigation<MainGraph>(startDestination = MainScreens.Home) {
+        composable<MainScreens.Home> { entry ->
             val vm = entry.sharedViewModel<MainViewModel>(navController = navigator.navHostController)
-            vm.viewModelScope.launch {  }
             HomeScreen(navigator,vm)
         }
-        composable<MainRoute.Favorites> { entry ->
+        composable<MainScreens.Favorites> { entry ->
             val vm = entry.sharedViewModel<MainViewModel>(navController = navigator.navHostController)
             FavoritesScreen(vm) }
     }

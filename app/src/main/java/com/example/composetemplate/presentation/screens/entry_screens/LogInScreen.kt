@@ -2,17 +2,17 @@ package com.example.composetemplate.presentation.screens.entry_screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.example.composetemplate.navigation.EntryRoute
-import com.example.composetemplate.navigation.MainRoute
+import com.example.composetemplate.navigation.EntryScreens
+import com.example.composetemplate.navigation.MainScreens
 import com.example.composetemplate.navigation.Navigator
 import com.example.composetemplate.presentation.components.BasicScreen
 
 @Composable
 fun LogInScreen(navigator: Navigator, shouldSowAdd: Boolean) {
     val nextDestination = if (shouldSowAdd) {
-        EntryRoute.Advertisement
+        EntryScreens.Advertisement
     } else {
-        MainRoute.Home
+        MainScreens.Home
     }
 
     BasicScreen(Color.Red, "Login") {

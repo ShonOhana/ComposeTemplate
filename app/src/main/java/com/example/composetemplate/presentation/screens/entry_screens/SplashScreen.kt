@@ -3,7 +3,7 @@ package com.example.composetemplate.presentation.screens.entry_screens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
-import com.example.composetemplate.navigation.EntryRoute
+import com.example.composetemplate.navigation.EntryScreens
 import com.example.composetemplate.navigation.Navigator
 import com.example.composetemplate.presentation.components.BasicScreen
 import kotlinx.coroutines.delay
@@ -31,6 +31,6 @@ fun SplashScreen(navigator: Navigator) {
          * Therefore, if you wish to share complex data like a large list of objects or if your data is relevant for multiple screens, use the ViewModel.
          * @see com.example.composetemplate.presentation.screens.main_screens.MainViewModel
          */
-        navigator.navigate(EntryRoute.Authentication(isUserAuthorized, shouldShowAdd))
+        navigator.navigate(EntryScreens.Authentication(isUserAuthorized, shouldShowAdd))
     }
 }
