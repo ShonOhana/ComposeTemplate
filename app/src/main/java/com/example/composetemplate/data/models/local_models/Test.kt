@@ -1,4 +1,4 @@
-package com.example.composetemplate.data.local.db_models
+package com.example.composetemplate.data.models.local_models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

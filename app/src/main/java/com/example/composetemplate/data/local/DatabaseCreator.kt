@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.composetemplate.data.local.dao.TestDao
-import com.example.composetemplate.data.local.db_models.Test
+import com.example.composetemplate.data.models.local_models.Test
 
 /**
  * This interface will provide us the database we create.

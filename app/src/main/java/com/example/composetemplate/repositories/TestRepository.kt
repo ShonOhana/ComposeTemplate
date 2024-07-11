@@ -3,7 +3,7 @@ package com.example.composetemplate.repositories
 import com.example.composetemplate.data.remote.requests.ExampleRequests
 import com.example.composetemplate.data.remote.responses.ExampleResponse
 import com.example.composetemplate.data.local.dao.TestDao
-import com.example.composetemplate.data.local.db_models.Test
+import com.example.composetemplate.data.models.local_models.Test
 import com.example.composetemplate.managers.NetworkManager
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse

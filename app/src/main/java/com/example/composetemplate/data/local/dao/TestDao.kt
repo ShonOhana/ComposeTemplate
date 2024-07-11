@@ -3,7 +3,7 @@ package com.example.composetemplate.data.local.dao
 import androidx.room.Dao
 import androidx.room.Query
 import com.example.composetemplate.data.local.BaseDao
-import com.example.composetemplate.data.local.db_models.Test
+import com.example.composetemplate.data.models.local_models.Test
 import kotlinx.coroutines.flow.Flow
 
 
