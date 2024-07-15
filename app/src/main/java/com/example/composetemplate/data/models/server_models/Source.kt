@@ -1,4 +1,4 @@
-package com.example.composetemplate
+package com.example.composetemplate.data.models.server_models
 
 import kotlinx.serialization.Serializable
 

@@ -1,6 +1,6 @@
 package com.example.composetemplate.managers
 
-import com.example.composetemplate.data.remote.BaseRequest
+import com.example.composetemplate.data.remote.base.BaseRequest
 import com.example.composetemplate.data.remote.base.BaseNetworking
 
 

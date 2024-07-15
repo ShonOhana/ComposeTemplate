@@ -1,9 +1,9 @@
-package com.example.composetemplate.database.dao
+package com.example.composetemplate.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.example.composetemplate.database.local.BaseDao
-import com.example.composetemplate.database.model.Test
+import com.example.composetemplate.data.local.BaseDao
+import com.example.composetemplate.data.models.local_models.Test
 import kotlinx.coroutines.flow.Flow
 
 
