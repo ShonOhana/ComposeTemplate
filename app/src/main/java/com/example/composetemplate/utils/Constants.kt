@@ -1,5 +1,11 @@
 package com.example.composetemplate.utils
 
+import com.example.composetemplate.data.models.local_models.User
+import com.example.composetemplate.repositories.AuthInteractor
+
+typealias LoginCallback = (User?, Exception?) -> Unit
+typealias SuccessCallback = (Boolean, Exception?) -> Unit
+typealias LoginProvider = AuthInteractor.LoginProvider
 class Constants {
 
     companion object {
@@ -12,6 +18,7 @@ class Constants {
 
         // Network
         const val BASE_URL = "newsapi.org"
+        const val FIREBASE_BASE_URL = "compose-template-c8fe9-default-rtdb.firebaseio.com"
         const val GET_SOURCES_PATH = "v2/sources"
         const val TIME_OUT = 30 * ONE_SECOND
 
@@ -28,6 +35,9 @@ class Constants {
 
         // Database
         const val NO_IMPLEMENT_DB_OPERATION_EXCEPTION = "You haven't implement database operation. Please notice to implement in your Dao. "
+
+        //Strings
+        const val LoginText = "Login"
 
     }
 }

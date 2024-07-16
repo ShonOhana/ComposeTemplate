@@ -3,6 +3,7 @@ package com.example.composetemplate.data.remote.base
 import io.ktor.http.HttpMethod
 
 interface BaseRequest {
+    val baseUrl: String
     val method: HttpMethod
     val path: String?
     val queries: MutableMap<String, String>?
