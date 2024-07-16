@@ -6,14 +6,17 @@ import io.ktor.client.plugins.timeout
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.URLProtocol
 import io.ktor.http.appendPathSegments
+import io.ktor.http.contentType
 
-fun HttpRequestBuilder.buildRequest(request: BaseRequest, baseUrl:String) {
+fun HttpRequestBuilder.buildRequest(request: BaseRequest) {
     url {
         method = request.method
         protocol = URLProtocol.HTTPS
-        host = baseUrl
+        host = request.baseUrl
+        contentType(ContentType.Application.Json)
         request.path?.let { appendPathSegments(it) }
         request.queries?.let {
             for (entry in it) {

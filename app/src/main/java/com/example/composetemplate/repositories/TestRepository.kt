@@ -22,6 +22,9 @@ class TestRepository(private val networkManager: NetworkManager, private val tes
         }
     }
 
-    suspend fun insertTest(test: Test) = testDao.insert(test)
-    fun getTest(id: Int) = testDao.getItem(id)
+    suspend fun upsert(test: Test) = testDao.upsert(test)
+    fun getItem(id: String) = testDao.getItem(id)
+    fun getItems() = testDao.getItems()
+    fun deleteTable() = testDao.deleteTable()
+
 }

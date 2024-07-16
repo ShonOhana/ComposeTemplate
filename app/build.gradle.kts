@@ -114,4 +114,7 @@ dependencies {
     /* Koin */
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+
+    //Accompanist
+    implementation(libs.accompanist.systemuicontroller)
 }

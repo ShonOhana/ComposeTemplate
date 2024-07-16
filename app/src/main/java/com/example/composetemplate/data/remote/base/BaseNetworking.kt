@@ -33,7 +33,7 @@ abstract class BaseNetworking : BaseServerClient {
         if (!applyInterceptor()) return null
         return try {
             client.request {
-                buildRequest(request, baseUrl)
+                buildRequest(request)
             }.body()
         } catch (exception: Exception) {
             LogsManager().logServerError(exception.message)
