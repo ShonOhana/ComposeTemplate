@@ -21,13 +21,13 @@ class MainViewModel(private val repository: TestRepository) : ViewModel() {
 
     fun saveDataToDB() {
         viewModelScope.launch {
-            repository.insertTest(Test(111, "Some Data", 2))
+            repository.upsert(Test(111, "Some Data", 2))
         }
     }
 
     fun loadDataFromDB() {
         viewModelScope.launch {
-            repository.getTest(111).collect {
+            repository.getItem("111").collect {
                 LogsManager().logMessage(type.VERBOSE, tag.GENERAL, it.s)
             }
         }

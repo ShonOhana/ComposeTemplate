@@ -26,6 +26,8 @@ class Constants {
         const val SERVICE_UNAVAILABLE_EXCEPTION = "The service is temporarily unavailable due to high load or maintenance."
         const val TIME_OUT_EXCEPTION = "The server did not respond within the expected time. Please check your internet connection and try again."
 
+        // Database
+        const val NO_IMPLEMENT_DB_OPERATION_EXCEPTION = "You haven't implement database operation. Please notice to implement in your Dao. "
 
     }
 }

@@ -2,25 +2,30 @@ package com.example.composetemplate.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Update
+import androidx.room.Upsert
+import com.example.composetemplate.utils.exceptions.NoImplementationDbOperationException
 import kotlinx.coroutines.flow.Flow
 
 /**
- * This interface will include all the necessary operations related to savin, updating and deleting data from DB.
+ * This interface will include all the necessary operations related to saving, updating and deleting data from DB.
  * Its main purpose is to create a contract we defined with any type of database we want to use.
  *
  * Another main purpose to implement this interface is to change easily the instance of the classes using DI.
  * make the code more readable and testability
  *
+ * NOTICE: In this project we work with Flow so we will get our item in Flow.
+ * if we would like to change to something else (LiveData for example), we will change the signature,
+ * and that will make us to implement everything and to keep unity
+ *
+ * NOTE: every necessary methods we can add here.
  */
 interface DatabaseOperations<T> {
-    suspend fun insert(item: T) /** Insert model to DB */
-    suspend fun insert(items: List<T>) /** Insert list of model to DB */
-    suspend fun update(item: T) /** Update the model in DB */
+    suspend fun upsert(item: T) /** Insert or update model to DB */
+    suspend fun upsert(items: List<T>) /** Insert or update list of model to DB */
     suspend fun deleteItem(item: T) /** Delete model to DB */
-
+    fun getItem(id: String): Flow<T> /** Get Single model in Flow to DB */
+    fun getItems(): Flow<List<T>> /** Get models list in Flow to DB */
+    fun deleteTable() /** Delete the all table */
 }
 
 /**
@@ -33,12 +38,10 @@ interface DatabaseOperations<T> {
  */
 @Dao
 interface BaseDao<T> : DatabaseOperations<T> {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override suspend fun insert(item: T)
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override suspend fun insert(items: List<T>)
-    @Update
-    override suspend fun update(item: T)
+    @Upsert
+    override suspend fun upsert(item: T)
+    @Upsert
+    override suspend fun upsert(items: List<T>)
     @Delete
     override suspend fun deleteItem(item: T)
 
@@ -51,10 +54,16 @@ interface BaseDao<T> : DatabaseOperations<T> {
      * @sample getItems In this project we will fetch the data as flow to observe changes and maintain uniformity.
      * In this case if we want to change The flow to something else we change here and it will make us change in every places.
      *
-     * Without to implement this method the project will not compile! (good practice)
+     * Without to implement this method the project will make exception! (good practice)
      */
-    fun deleteTable()
-    fun getItem(id: Int): Flow<T>
-    fun getItems(): Flow<List<T>>
+    override fun deleteTable() {
+        TODO(reason = NoImplementationDbOperationException().message)
+    }
+    override fun getItem(id: String): Flow<T> {
+        TODO(reason = NoImplementationDbOperationException().message)
+    }
+    override fun getItems(): Flow<List<T>> {
+        TODO(reason = NoImplementationDbOperationException().message)
+    }
 
 }
