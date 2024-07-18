@@ -18,12 +18,26 @@ import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = APP_DATA_STORE)
 
+/**
+ * Extension function to read a value from the DataStore.
+ * @param key The key used to retrieve the value.
+ * @param type The type of the data to be retrieved (defined in DataStoreType).
+ * @see DataStoreType
+ * @return A Flow that emits the value associated with the given key and type, or null if not found.
+ */
 fun Context.readValue(key: String, type: DataStoreType): Flow<Any?> {
     return dataStore.data.map { preferences ->
         preferences[type.getPreferencesKey(key)]
     }
 }
 
+/**
+ * Extension function to write a value to the DataStore.
+ * @param key The key used to store the value.
+ * @param type The type of the data to be stored (defined in DataStoreType).
+ * @see DataStoreType
+ * @param value The value to be stored.
+ */
 suspend fun Context.writeValue(key: String, type: DataStoreType, value: Any) {
     dataStore.edit { mutablePreferences ->
         when (type) {
