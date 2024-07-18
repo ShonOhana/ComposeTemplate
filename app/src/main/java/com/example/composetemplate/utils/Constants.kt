@@ -29,5 +29,12 @@ class Constants {
         // Database
         const val NO_IMPLEMENT_DB_OPERATION_EXCEPTION = "You haven't implement database operation. Please notice to implement in your Dao. "
 
+        // DataStore
+        // Files
+        const val APP_DATA_STORE = "app_data_store"
+        // Keys
+        const val DS_TEST_KEY = "test_key"
+
+
     }
 }
