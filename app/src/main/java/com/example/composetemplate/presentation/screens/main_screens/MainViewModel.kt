@@ -2,22 +2,19 @@ package com.example.composetemplate.presentation.screens.main_screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.composetemplate.MainApplication
 import com.example.composetemplate.data.models.local_models.Test
+import com.example.composetemplate.managers.DataStoreManager
 import com.example.composetemplate.repositories.TestRepository
 import com.example.composetemplate.utils.Constants.Companion.DS_TEST_KEY
 import com.example.composetemplate.utils.LogsManager
 import com.example.composetemplate.utils.enums.DataStoreType
-import com.example.composetemplate.utils.extensions.readValue
-import com.example.composetemplate.utils.extensions.writeValue
 import com.example.composetemplate.utils.tag
 import com.example.composetemplate.utils.type
 import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val repository: TestRepository,
-    private val application: MainApplication
-
+    private val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
     fun getDataFromServer() {
@@ -36,13 +33,13 @@ class MainViewModel(
 
     fun writeDataToDS() {
         viewModelScope.launch {
-            application.readValue(DS_TEST_KEY,DataStoreType.STRING).collect{ data ->
+            dataStoreManager.readDSValue(DS_TEST_KEY, DataStoreType.STRING).collect { data ->
                 (data as? String)?.let {
                     LogsManager().logMessage(type.VERBOSE, tag.DATA_STORE, "read data $it from DS")
-                }?:run{
+                } ?: run {
                     val dataToBeSaved = "Some Data"
                     LogsManager().logMessage(type.VERBOSE, tag.DATA_STORE, "save value to DS")
-                    application.writeValue(DS_TEST_KEY, DataStoreType.STRING,dataToBeSaved)
+                    dataStoreManager.writeDSValue(DS_TEST_KEY, DataStoreType.STRING, dataToBeSaved)
                 }
             }
         }
