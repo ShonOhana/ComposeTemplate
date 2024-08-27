@@ -17,6 +17,7 @@ import com.example.composetemplate.presentation.common.LoginPageHeader
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
 import com.example.composetemplate.ui.theme.LoginScreenColor
+import com.example.composetemplate.utils.Constants
 import com.example.composetemplate.utils.Constants.Companion.LoginText
 import org.koin.androidx.compose.koinViewModel
 
@@ -71,7 +72,7 @@ fun LoginScreen(
             modifier = modifier
                 .padding(top = 12.dp)
                 .clickable { onRegisterPagePageClick() },
-            text = "Don't have an account? Register! ",
+            text = Constants.RegisterText,
             color = Color.White,
             style = MaterialTheme.typography.labelLarge
         )

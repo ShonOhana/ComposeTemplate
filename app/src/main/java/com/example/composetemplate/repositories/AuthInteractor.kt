@@ -10,7 +10,14 @@ import com.example.composetemplate.utils.extensions.isSuccessful
 import io.ktor.client.statement.HttpResponse
 
 /**
- *  PRE-CONDITION: enable every auth option in firebase console that you want to use,
+ * @Interactor explanation:
+ * In MVVM, an Interactor encapsulates logic or actions that the ViewModel requests to process user interactions or data changes.
+ * It acts as a middle layer between the ViewModel and repositories.
+ * ensuring the ViewModel focuses only on managing UI-related data while the Interactor handles the core logic and data retrieval.
+ */
+
+/**
+ *  @AuthInteractor PRE-CONDITION: enable every auth option in firebase console that you want to use,
  *  otherwise it will not work and the network calls will go to onFailure
  *  RECOMMENDATION: Add SHA1 key in firebase project settings, you need it for example, in google auth
  */
@@ -34,13 +41,13 @@ class AuthInteractor(
             LoginProvider.REGISTER_WITH_EMAIL_AND_PASSWORD -> {
                 val email = (loginParams as? NonSocialLoginParameter)?.email ?: ""
                 val password = loginParams.password
-                val user = User(email = email, full_name = loginParams.fullName, permission_type = PermissionType.DEVELOPER.name.lowercase())
+                val user = User(email = email, fullName = loginParams.fullName, permissionType = PermissionType.DEVELOPER.name.lowercase())
                 loginService.createEmailPasswordUser(user,password, loginCallback)
             }
             LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD -> {
                 val email = (loginParams as? NonSocialLoginParameter)?.email ?: ""
                 val password = loginParams.password
-                val user = User(email = email, full_name = "Shon", permission_type = PermissionType.DEVELOPER.name.lowercase())
+                val user = User(email = email, fullName = "Shon", permissionType = PermissionType.DEVELOPER.name.lowercase())
                 loginService.signInEmailPasswordUser(user,password, loginCallback)
             }
         }

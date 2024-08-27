@@ -8,6 +8,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 
+/**
+ * In the MVVM architecture, the DataSource layer is responsible for providing data to the repository
+ * from various sources, such as remote APIs, local databases, or in-memory caches.
+ * allowing the repository to seamlessly aggregate and supply data to the ViewModel without worrying about the underlying data origins or access mechanisms.
+ */
 class FirebaseDataSource() : AuthDBServiceable {
 
     /**

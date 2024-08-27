@@ -6,16 +6,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import com.example.composetemplate.utils.Constants
 
 enum class LoginScreenEnum {
     EMAIL, PASSWORD, FULL_NAME, CONFIRM_PASSWORD ;
 
     fun getPlaceHolder(): String{
         return when(this) {
-            EMAIL -> "Email"
-            PASSWORD -> "Password"
-            FULL_NAME -> "Full Name"
-            CONFIRM_PASSWORD -> "Confirm Password"
+            EMAIL -> Constants.EmailText
+            PASSWORD -> Constants.PasswordText
+            FULL_NAME -> Constants.FullNameText
+            CONFIRM_PASSWORD -> Constants.ComfirmPasswordText
         }
     }
 

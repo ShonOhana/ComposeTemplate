@@ -38,6 +38,11 @@ class Constants {
 
         //Strings
         const val LoginText = "Login"
+        const val RegisterText = "Don't have an account? Register!"
+        const val EmailText = "Email"
+        const val PasswordText = "Password"
+        const val FullNameText = "Full Name"
+        const val ComfirmPasswordText = "Confirm Password"
 
     }
 }

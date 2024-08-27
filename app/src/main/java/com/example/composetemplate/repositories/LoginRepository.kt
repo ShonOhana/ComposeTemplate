@@ -6,6 +6,9 @@ import com.example.composetemplate.utils.LoginCallback
 
 
 /**
+ *
+ * In the MVVM architecture, the Repository layer acts as a mediator between the ViewModel and data sources.
+ * It aggregates data from multiple sources, such as remote APIs, databases, and caches, and provides a clean API for the ViewModel
  * This class contain the functionality of all login auth types
  */
 class LoginRepository(

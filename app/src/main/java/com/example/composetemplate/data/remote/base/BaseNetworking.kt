@@ -9,7 +9,13 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.request
+import io.ktor.http.ContentType.Application.Json
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
 
 /** This class serves as a provider for all networking requirements within the application.
 For instance, it includes functionalities such as the network client and the capability to send requests.
@@ -18,6 +24,7 @@ Additionally, this class offers a preconfigured base client for immediate use. I
 @see Networking implementation */
 abstract class BaseNetworking : BaseServerClient {
 
+    @OptIn(ExperimentalSerializationApi::class)
     override val client: HttpClient = HttpClient(CIO) {
         /* By default, Ktor doesn't validate a response depending on its status code.
            When expectSuccess is set to true, Ktor will throw an exception if the response status code is not in the 2xx range (200 to 299).

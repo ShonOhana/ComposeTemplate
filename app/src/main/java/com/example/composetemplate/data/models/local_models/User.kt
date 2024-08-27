@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 // here we don't save password security wise
 @Serializable
 data class User(
-    var permission_type: String,
-    var full_name: String,
-    var created_on: String? = DateUtil.milliToDateFormat(System.currentTimeMillis()),
+    var permissionType: String,
+    var fullName: String,
+    var createdOn: String? = DateUtil.milliToDateFormat(System.currentTimeMillis()),
     var email: String,
     var fcm_token: String? = null,
 )
