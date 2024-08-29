@@ -23,6 +23,10 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 
+/**
+ * @OptIn using experimental features from the Kotlinx Serialization API.
+ * This acknowledges that the features may be unstable and subject to change.
+ */
 @OptIn(ExperimentalSerializationApi::class)
 fun HttpClientConfig<CIOEngineConfig>.handleJson() {
     install(ContentNegotiation) {
