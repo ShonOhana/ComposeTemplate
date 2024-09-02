@@ -19,14 +19,22 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
 
+/**
+ * @OptIn using experimental features from the Kotlinx Serialization API.
+ * This acknowledges that the features may be unstable and subject to change.
+ */
+@OptIn(ExperimentalSerializationApi::class)
 fun HttpClientConfig<CIOEngineConfig>.handleJson() {
     install(ContentNegotiation) {
         json(Json {
             prettyPrint = true
             isLenient = true
             ignoreUnknownKeys = true
+            namingStrategy = JsonNamingStrategy.SnakeCase // this is convert camelCase to snake_case
         }, ContentType.Application.Json)
     }
 }

@@ -7,7 +7,7 @@ import com.example.composetemplate.navigation.Navigator
 @Composable
 fun AuthenticationScreen(args: EntryScreens.Authentication, navigator: Navigator) {
     if (args.isAuthorized) {
-        LogInScreen(navigator, args.shouldShowAdd)
+        RegisterScreen(navigator, args.shouldShowAdd) //todo: move
     } else {
         RegisterScreen(navigator, args.shouldShowAdd)
     }

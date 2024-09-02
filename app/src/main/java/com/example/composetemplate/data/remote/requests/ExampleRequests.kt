@@ -19,6 +19,7 @@ sealed class ExampleRequests {
         override val headers: MutableMap<String, String>? = null,
         override val body: Any? = null,
         override val timeout: Long? = null,
+        override val baseUrl: String = Constants.BASE_URL
     ) : BaseRequest
 
 }

@@ -12,7 +12,7 @@ interface TestDao: BaseDao<Test> {
     @Query("DELETE FROM test")
     override fun deleteTable()
     @Query("SELECT * FROM test WHERE id =:id ")
-    override fun getItem(id: Int): Flow<Test>
+    override fun getItem(id: String): Flow<Test>
     @Query("SELECT * FROM test")
     override fun getItems(): Flow<List<Test>>
 }
