@@ -44,7 +44,7 @@ class MainViewModel(
             }
         }
     }
-
+    
     fun loadDataFromDB() {
         viewModelScope.launch {
             repository.getItem("111").collect {
@@ -52,5 +52,4 @@ class MainViewModel(
             }
         }
     }
-    
 }
