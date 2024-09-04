@@ -1,6 +1,8 @@
 package com.example.composetemplate.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -31,4 +33,22 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
     */
+)
+
+val TitleStyle = TextStyle(
+    fontFamily = FontFamily.SansSerif,
+    fontWeight = FontWeight.Bold,
+    fontSize = 48.sp,
+    letterSpacing = 0.5.sp
+)
+
+/**
+ * The Immutable annotation is used for optimization. For more information,
+ * @see Immutable
+ *
+ * @property CustomTypography A data class that contains all our text styles.
+ */
+@Immutable
+data class CustomTypography(
+    val title: TextStyle = TextStyle.Default
 )
