@@ -1,5 +1,11 @@
 package com.example.composetemplate.utils
 
+import com.example.composetemplate.data.models.local_models.User
+import com.example.composetemplate.repositories.AuthInteractor
+
+typealias LoginCallback = (User?, Exception?) -> Unit
+typealias SuccessCallback = (Boolean, Exception?) -> Unit
+typealias LoginProvider = AuthInteractor.LoginProvider
 class Constants {
 
     companion object {
@@ -12,6 +18,7 @@ class Constants {
 
         // Network
         const val BASE_URL = "newsapi.org"
+        const val FIREBASE_BASE_URL = "compose-template-c8fe9-default-rtdb.firebaseio.com"
         const val GET_SOURCES_PATH = "v2/sources"
         const val TIME_OUT = 30 * ONE_SECOND
 
@@ -35,6 +42,14 @@ class Constants {
         // Keys
         const val DS_TEST_KEY = "test_key"
 
+
+        //Strings
+        const val LoginText = "Login"
+        const val RegisterText = "Don't have an account? Register!"
+        const val EmailText = "Email"
+        const val PasswordText = "Password"
+        const val FullNameText = "Full Name"
+        const val ComfirmPasswordText = "Confirm Password"
 
     }
 }
