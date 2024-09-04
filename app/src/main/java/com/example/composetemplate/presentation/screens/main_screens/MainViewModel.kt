@@ -25,7 +25,6 @@ class MainViewModel(
         }
     }
 
-    //test push 
     fun saveDataToDB() {
         viewModelScope.launch {
             repository.upsert(Test(111, "Some Data", 2))
@@ -53,5 +52,4 @@ class MainViewModel(
             }
         }
     }
-
 }
