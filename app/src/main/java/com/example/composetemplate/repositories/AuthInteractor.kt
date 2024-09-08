@@ -23,7 +23,7 @@ import io.ktor.client.statement.HttpResponse
  */
 
 class AuthInteractor(
-    private val loginService: LoginRepository,
+    private val loginRepository: LoginRepository,
     private val networkManager: NetworkManager
 ) {
 
@@ -42,22 +42,24 @@ class AuthInteractor(
                 val email = (loginParams as? NonSocialLoginParameter)?.email ?: ""
                 val password = loginParams.password
                 val user = User(email = email, fullName = loginParams.fullName, permissionType = PermissionType.DEVELOPER.name.lowercase())
-                loginService.createEmailPasswordUser(user,password, loginCallback)
+                loginRepository.createEmailPasswordUser(user,password, loginCallback)
             }
             LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD -> {
                 val email = (loginParams as? NonSocialLoginParameter)?.email ?: ""
                 val password = loginParams.password
                 val user = User(email = email, fullName = "Shon", permissionType = PermissionType.DEVELOPER.name.lowercase())
-                loginService.signInEmailPasswordUser(user,password, loginCallback)
+                loginRepository.signInEmailPasswordUser(user,password, loginCallback)
             }
         }
     }
 
     /** Create or update in database */
     suspend fun createOrUpdateUserInDb(user: User): Boolean {
-        val request = loginService.createOrUpdateUserRequest(user)
+        val request = loginRepository.createOrUpdateUserRequest(user)
         val response = (networkManager.sendRequest(request) as? HttpResponse)
         return response?.isSuccessful() == true
     }
+
+    fun logOut() = loginRepository.logOut()
 
 }

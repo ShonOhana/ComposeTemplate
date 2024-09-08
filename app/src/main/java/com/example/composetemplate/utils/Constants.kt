@@ -46,6 +46,7 @@ class Constants {
         //Strings
         const val LoginText = "Login"
         const val RegisterText = "Don't have an account? Register!"
+        const val AuthenticationErrorText = "Authentication error - Please see all errors related to firebase auth"
         const val EmailText = "Email"
         const val PasswordText = "Password"
         const val FullNameText = "Full Name"

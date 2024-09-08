@@ -57,4 +57,6 @@ class LoginRepository(
         return firebaseDataSource.createOrUpdateUserRequestForFirebase(user)
     }
 
+    fun logOut() = firebaseDataSource.logOut()
+
 }

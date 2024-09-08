@@ -23,5 +23,5 @@ interface LoginParameterizable {
 data class NonSocialLoginParameter(
     override val email: String,
     override val password: String,
-    override val fullName: String
+    override val fullName: String = ""
 ): LoginParameterizable

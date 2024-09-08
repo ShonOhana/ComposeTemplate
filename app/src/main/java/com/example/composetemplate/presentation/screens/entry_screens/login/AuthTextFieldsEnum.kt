@@ -2,13 +2,19 @@ package com.example.composetemplate.presentation.screens.entry_screens.login
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import com.example.composetemplate.utils.Constants
 
-enum class LoginScreenEnum {
+enum class LoginScreenStateManagement {
+    Login,
+    Register
+}
+
+enum class AuthTextFieldsEnum {
     EMAIL, PASSWORD, FULL_NAME, CONFIRM_PASSWORD ;
 
     fun getPlaceHolder(): String{
@@ -20,12 +26,12 @@ enum class LoginScreenEnum {
         }
     }
 
-    fun getKeyboardOptions(): KeyboardOptions {
+    fun getKeyboardOptions(isLastEditText: Boolean): KeyboardOptions {
         return when(this) {
-            EMAIL -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
+            EMAIL -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
             CONFIRM_PASSWORD,
-            PASSWORD -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password)
-            FULL_NAME -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text)
+            PASSWORD -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password, imeAction = if (isLastEditText) ImeAction.Done else ImeAction.Next)
+            FULL_NAME -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text,imeAction = ImeAction.Next)
         }
     }
 

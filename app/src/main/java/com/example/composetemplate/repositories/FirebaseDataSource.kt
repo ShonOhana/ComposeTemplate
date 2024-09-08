@@ -71,4 +71,8 @@ class FirebaseDataSource() : AuthDBServiceable {
         return FirebaseUserRequests.createOrUpdateUser(queries = queries, body = user)
     }
 
+    fun logOut() {
+        auth.signOut()
+    }
+
 }
