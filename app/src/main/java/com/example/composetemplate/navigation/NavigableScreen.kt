@@ -18,7 +18,6 @@ interface NavigableScreen {
 enum class AppScreen{
     Splash,
     Auth,
-    Authentication,
     Advertisement,
     Home,
     Favorites
@@ -45,20 +44,16 @@ sealed class EntryScreens : NavigableScreen {
     /* Authentication route represents the authentication screen of the application.
      * It contains additional arguments to indicate the authorization status and whether to show an advertisement.
      */
-    @Serializable
-    data class Authentication(
-        val isAuthorized: Boolean,
-        val shouldShowAdd: Boolean
-    ) : EntryScreens() {
-        override val screen: AppScreen
-            get() = AppScreen.Authentication
-    }
-
-    @Serializable
-    data object Advertisement : EntryScreens() {
-        override val screen: AppScreen
-            get() = AppScreen.Advertisement
-    }
+    //todo: this is in comment to have a reference to pass data between screens
+    //todo: SHON: delete after I pass data to different screen
+//    @Serializable
+//    data class Authentication(
+//        val isAuthorized: Boolean,
+//        val shouldShowAdd: Boolean
+//    ) : EntryScreens() {
+//        override val screen: AppScreen
+//            get() = AppScreen.Authentication
+//    }
 }
 
 /* MainRoute is a sealed class that represents the routes in the main flow of the application.

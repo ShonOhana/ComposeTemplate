@@ -32,7 +32,7 @@ class Navigator {
     fun navigate(navigableScreen: NavigableScreen) {
 
         when(navigableScreen.screen){
-            AppScreen.Authentication -> {
+            AppScreen.Auth -> {
                 navHostController.navigate(navigableScreen){
                     /* When the app navigates from the splash screen to authentication screen,
                      * we want to the remove the splash screen (startDestinationId) from the back stack */
@@ -43,7 +43,6 @@ class Navigator {
                 /* When the app navigates to the home screen we want to remove all the EntryGraph from the back stack */
                 navigateAndRemoveGraph<EntryGraph>(navigableScreen)
             }
-            AppScreen.Auth,
             AppScreen.Splash,
             AppScreen.Advertisement,
             AppScreen.Favorites ->

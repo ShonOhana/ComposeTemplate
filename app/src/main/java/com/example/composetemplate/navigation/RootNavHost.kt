@@ -7,9 +7,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import androidx.navigation.toRoute
-import com.example.composetemplate.presentation.screens.entry_screens.AdvertisementScreen
-import com.example.composetemplate.presentation.screens.entry_screens.AuthenticationScreen
 import com.example.composetemplate.presentation.screens.main_screens.MainViewModel
 import com.example.composetemplate.presentation.screens.entry_screens.SplashScreen
 import com.example.composetemplate.presentation.screens.main_screens.HomeScreen
@@ -54,13 +51,15 @@ fun NavGraphBuilder.entryNavGraph(
     navigation<EntryGraph>(startDestination = EntryScreens.Splash) {
         composable<EntryScreens.Splash> { SplashScreen(navigator) }
         composable<EntryScreens.Auth> { AuthScreen() }
-        composable<EntryScreens.Authentication> {
-            /* Authentication is a data class that contains arguments.
-             * Here is an example for getting the data from the route and passing it to the screen composable function. */
-            val args = it.toRoute<EntryScreens.Authentication>()
-            AuthenticationScreen(args, navigator)
-        }
-        composable<EntryScreens.Advertisement> { AdvertisementScreen(navigator) }
+
+        //todo: this is in comment to have a reference to pass data between screens
+        //todo: SHON: delete after I pass data to different screen
+//        composable<EntryScreens.Authentication> {
+//            /* Authentication is a data class that contains arguments.
+//             * Here is an example for getting the data from the route and passing it to the screen composable function. */
+//            val args = it.toRoute<EntryScreens.Authentication>()
+//            AuthenticationScreen(args, navigator)
+//        }
     }
 }
 
