@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
-import com.example.composetemplate.presentation.screens.entry_screens.login.LoginScreenStateManagement
+import com.example.composetemplate.presentation.screens.entry_screens.login.AuthScreenState
 import com.example.composetemplate.ui.theme.LoginScreenColor
 import com.example.composetemplate.utils.Constants
 import com.example.composetemplate.utils.Constants.Companion.LoginText
@@ -56,11 +56,11 @@ fun RegisterScreen(
                 val loginField = registerFields[index]
                 LoginTextField(
                     modifier = Modifier,
-                    text = viewModel.setText(loginField, LoginScreenStateManagement.Register),
+                    text = viewModel.setText(loginField, AuthScreenState.Register),
                     loginScreenEnum = loginField,
-                    isValid = viewModel.validateEditText(loginField, LoginScreenStateManagement.Register),
+                    isValid = viewModel.validateEditText(loginField, AuthScreenState.Register),
                     onValueChange = { newValue ->
-                        viewModel.onEvent(loginField, newValue, LoginScreenStateManagement.Register)
+                        viewModel.onEvent(loginField, newValue, AuthScreenState.Register)
                     },
                     isLastEditText = index == registerFields.size - 1
                 )

@@ -1,5 +1,6 @@
 package com.example.composetemplate.navigation
 
+import AuthScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -52,6 +53,7 @@ fun NavGraphBuilder.entryNavGraph(
 ) {
     navigation<EntryGraph>(startDestination = EntryScreens.Splash) {
         composable<EntryScreens.Splash> { SplashScreen(navigator) }
+        composable<EntryScreens.Auth> { AuthScreen() }
         composable<EntryScreens.Authentication> {
             /* Authentication is a data class that contains arguments.
              * Here is an example for getting the data from the route and passing it to the screen composable function. */

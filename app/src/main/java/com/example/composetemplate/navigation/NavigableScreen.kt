@@ -17,6 +17,7 @@ interface NavigableScreen {
  */
 enum class AppScreen{
     Splash,
+    Auth,
     Authentication,
     Advertisement,
     Home,
@@ -33,6 +34,12 @@ sealed class EntryScreens : NavigableScreen {
     data object Splash : EntryScreens() {
         override val screen: AppScreen
             get() = AppScreen.Splash
+    }
+
+    @Serializable
+    data object Auth : EntryScreens() {
+        override val screen: AppScreen
+            get() = AppScreen.Auth
     }
 
     /* Authentication route represents the authentication screen of the application.

@@ -45,11 +45,11 @@ fun LoginScreen(
             val loginField = loginFields[index]
             LoginTextField(
                 modifier = Modifier,
-                text = viewModel.setText(loginField, LoginScreenStateManagement.Login),
+                text = viewModel.setText(loginField, AuthScreenState.Login),
                 loginScreenEnum = loginField,
-                isValid = viewModel.validateEditText(loginField, LoginScreenStateManagement.Login),
+                isValid = viewModel.validateEditText(loginField, AuthScreenState.Login),
                 onValueChange = { newValue ->
-                    viewModel.onEvent(loginField, newValue, LoginScreenStateManagement.Login)
+                    viewModel.onEvent(loginField, newValue, AuthScreenState.Login)
                 },
                 isLastEditText = index == loginFields.size - 1
             )

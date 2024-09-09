@@ -9,7 +9,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import com.example.composetemplate.utils.Constants
 
-enum class LoginScreenStateManagement {
+enum class AuthScreenState {
     Login,
     Register
 }

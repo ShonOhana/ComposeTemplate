@@ -10,7 +10,7 @@ import com.example.composetemplate.presentation.screens.entry_screens.login.Auth
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.EMAIL
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.FULL_NAME
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.PASSWORD
-import com.example.composetemplate.presentation.screens.entry_screens.login.LoginScreenStateManagement
+import com.example.composetemplate.presentation.screens.entry_screens.login.AuthScreenState
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignInData
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpData
 import com.example.composetemplate.repositories.AuthInteractor
@@ -129,9 +129,9 @@ class AuthViewModel(
 
     /** This is to set the text after the change in the edit text according to the parameter we change.
      * This method has direct connection to onEvent() method */
-    fun setText(authTextFieldsEnum: AuthTextFieldsEnum, loginScreenStateManagement: LoginScreenStateManagement): String {
-        return when (loginScreenStateManagement) {
-            LoginScreenStateManagement.Login -> {
+    fun setText(authTextFieldsEnum: AuthTextFieldsEnum, authScreenState: AuthScreenState): String {
+        return when (authScreenState) {
+            AuthScreenState.Login -> {
                 when (authTextFieldsEnum) {
                     EMAIL -> signInData.email
                     PASSWORD -> signInData.password
@@ -139,7 +139,7 @@ class AuthViewModel(
                     CONFIRM_PASSWORD -> ""  //do noting in sign in
                 }
             }
-            LoginScreenStateManagement.Register -> {
+            AuthScreenState.Register -> {
                 when (authTextFieldsEnum) {
                     EMAIL -> signupData.email
                     PASSWORD -> signupData.password
@@ -150,9 +150,9 @@ class AuthViewModel(
         }
     }
     /** check the validation of the edit text according to the AuthTextFieldsEnum */
-    fun validateEditText(authTextFieldsEnum: AuthTextFieldsEnum, loginScreenStateManagement: LoginScreenStateManagement): Boolean {
-         return when (loginScreenStateManagement) {
-             LoginScreenStateManagement.Login -> {
+    fun validateEditText(authTextFieldsEnum: AuthTextFieldsEnum, authScreenState: AuthScreenState): Boolean {
+         return when (authScreenState) {
+             AuthScreenState.Login -> {
                  when (authTextFieldsEnum) {
                     EMAIL -> signInData.isEmailValid
                     PASSWORD -> signInData.isPasswordValid
@@ -160,7 +160,7 @@ class AuthViewModel(
                     CONFIRM_PASSWORD -> false
                 }
             }
-             LoginScreenStateManagement.Register -> {
+             AuthScreenState.Register -> {
                  when (authTextFieldsEnum) {
                     EMAIL -> signupData.isEmailValid
                     PASSWORD -> signupData.isPasswordValid
@@ -172,9 +172,9 @@ class AuthViewModel(
     }
 
     /** Change the edit text value to its new value when you type the keyboard */
-    fun onEvent(authTextFieldsEnum: AuthTextFieldsEnum, newValue: String, loginScreenStateManagement: LoginScreenStateManagement){
-        when (loginScreenStateManagement) {
-            LoginScreenStateManagement.Login -> {
+    fun onEvent(authTextFieldsEnum: AuthTextFieldsEnum, newValue: String, authScreenState: AuthScreenState){
+        when (authScreenState) {
+            AuthScreenState.Login -> {
                 when (authTextFieldsEnum) {
                     EMAIL -> _signInData.value = signInData.copy(email = newValue)
                     PASSWORD -> _signInData.value = signInData.copy(password = newValue)
@@ -182,7 +182,7 @@ class AuthViewModel(
                     CONFIRM_PASSWORD -> { }
                 }
             }
-            LoginScreenStateManagement.Register -> {
+            AuthScreenState.Register -> {
                 when (authTextFieldsEnum) {
                     FULL_NAME -> _signupData.value = signupData.copy(fullName = newValue)
                     EMAIL -> _signupData.value = signupData.copy(email = newValue)
