@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.composetemplate.ui.theme.LoginButtonColorDisable
-import com.example.composetemplate.ui.theme.LoginButtonColorEnable
+import com.example.composetemplate.ui.theme.LoginColorEnable
 
 
 @Composable
@@ -26,10 +26,10 @@ fun LoginScreenButton(
     ElevatedButton(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 24.dp)
             .height(52.dp),
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = if (!isEnabled) LoginButtonColorDisable else LoginButtonColorEnable
+            containerColor = if (!isEnabled) LoginButtonColorDisable else LoginColorEnable
         ),
         onClick = {
             if (isEnabled) {

@@ -14,6 +14,7 @@ fun SplashScreen(navigator: Navigator) {
     LaunchedEffect(Unit) {
         val fiveSeconds = 5000L
         delay(fiveSeconds)
+        // parameter to pass data for example
         val isUserAuthorized = false
         val shouldShowAdd = true
         /** We will pass `isUserAuthorized` and `shouldShowAdd` values to the Authentication screen with its navigation route.
@@ -31,6 +32,6 @@ fun SplashScreen(navigator: Navigator) {
          * Therefore, if you wish to share complex data like a large list of objects or if your data is relevant for multiple screens, use the ViewModel.
          * @see com.example.composetemplate.presentation.screens.main_screens.MainViewModel
          */
-        navigator.navigate(EntryScreens.Authentication(isUserAuthorized, shouldShowAdd))
+        navigator.navigate(EntryScreens.Auth)
     }
 }

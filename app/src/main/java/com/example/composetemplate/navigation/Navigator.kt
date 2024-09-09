@@ -32,7 +32,7 @@ class Navigator {
     fun navigate(navigableScreen: NavigableScreen) {
 
         when(navigableScreen.screen){
-            AppScreen.Authentication -> {
+            AppScreen.Auth -> {
                 navHostController.navigate(navigableScreen){
                     /* When the app navigates from the splash screen to authentication screen,
                      * we want to the remove the splash screen (startDestinationId) from the back stack */
@@ -48,6 +48,7 @@ class Navigator {
             AppScreen.Favorites ->
                 /* Simply navigate to the specified route without altering the back stack. */
                 navHostController.navigate(navigableScreen)
+
         }
     }
 
