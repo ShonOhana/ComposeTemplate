@@ -3,6 +3,7 @@ package com.example.composetemplate.repositories
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.remote.base.BaseRequest
 import com.example.composetemplate.utils.LoginCallback
+import com.example.composetemplate.utils.SuccessCallback
 
 
 /**
@@ -25,7 +26,7 @@ class LoginRepository(
             firebaseDataSource.auth.createUserWithEmailAndPassword(user.email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        firebaseDataSource.createOrUpdateUserInDB(user, loginCallback)
+                        firebaseDataSource.createOrUpdateUser(user, loginCallback)
                     } else {
                         loginCallback(null, task.exception)
                     }
@@ -40,7 +41,7 @@ class LoginRepository(
             firebaseDataSource.auth.signInWithEmailAndPassword(user.email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        firebaseDataSource.createOrUpdateUserInDB(user, loginCallback)
+                        firebaseDataSource.createOrUpdateUser(user, loginCallback)
                     }  else {
                         loginCallback(null, task.exception)
                     }
@@ -57,6 +58,12 @@ class LoginRepository(
         return firebaseDataSource.createOrUpdateUserRequestForFirebase(user)
     }
 
+    // First fetch the access token
+    fun getUserAccessToken(successCallback: SuccessCallback) = firebaseDataSource.getUser(successCallback)
+
+    fun getUserRequest() = firebaseDataSource.getUserRequest()
+
+    //logOut user in firebase
     fun logOut() = firebaseDataSource.logOut()
 
 }

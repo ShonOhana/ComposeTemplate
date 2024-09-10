@@ -5,23 +5,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
+import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.CONFIRM_PASSWORD
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.EMAIL
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.FULL_NAME
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.PASSWORD
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthScreenState
+import com.example.composetemplate.presentation.screens.entry_screens.login.BaseAuthScreenData
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignInData
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpData
 import com.example.composetemplate.repositories.AuthInteractor
 import com.example.composetemplate.utils.Constants
+import com.example.composetemplate.utils.LoginCallback
 import com.example.composetemplate.utils.LoginProvider
 import com.example.composetemplate.utils.LogsManager
+import com.example.composetemplate.utils.SuccessCallback
 import com.example.composetemplate.utils.UIState
 import com.example.composetemplate.utils.tag
 import com.example.composetemplate.utils.type
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 
 class AuthViewModel(
@@ -73,8 +78,7 @@ class AuthViewModel(
         }
     }
 
-
-    fun createEmailPasswordUser() {
+    fun createEmailPasswordUser(successCallback: SuccessCallback) {
         uiAuthState.value = UIState.Loading()
         val loginParams =
             NonSocialLoginParameter(signupData.email, signupData.password, signupData.fullName)
@@ -89,20 +93,34 @@ class AuthViewModel(
                         if (success){
                             _signupData.value = signupData.copy(authError = false)
                             uiAuthState.value = UIState.Success(true)
+                            successCallback(true,null)
                         }else {
                             uiAuthState.value = UIState.Error(Constants.UNKNOWN_EXCEPTION)
                             _signupData.value = signupData.copy(authError = true)
+                            successCallback(false, Exception(Constants.UNKNOWN_EXCEPTION))
                         }
                     }
                 }
             } else {
                 uiAuthState.value = UIState.Error(exception.message)
                 _signupData.value = signupData.copy(authError = true)
+                successCallback(false, exception)
             }
         }
     }
 
-    fun signInEmailAndPassword(){
+    fun getUser(loginCallback: LoginCallback) {
+        authInteractor.getUserAccessToken { success, exception ->
+            if (success && exception == null) {
+                viewModelScope.launch {
+                    val user = authInteractor.getUser()
+                    loginCallback(user, null)
+                }
+            } else loginCallback(null , exception)
+        }
+    }
+
+    fun signInEmailAndPassword(successCallback: SuccessCallback){
         uiAuthState.value = UIState.Loading()
         val loginParams = NonSocialLoginParameter(signInData.email,signInData.password)
         authInteractor.login(LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD,loginParams) { user, exception ->
@@ -114,15 +132,18 @@ class AuthViewModel(
                         if (success){
                             _signInData.value = signInData.copy(authError = false)
                             uiAuthState.value = UIState.Success(true)
+                            successCallback(true,null)
                         }else {
                             uiAuthState.value = UIState.Error(Constants.UNKNOWN_EXCEPTION)
                             _signInData.value = signInData.copy(authError = true)
+                            successCallback(false, Exception(Constants.UNKNOWN_EXCEPTION))
                         }
                     }
                 }
             } else {
                 uiAuthState.value = UIState.Error(exception.message)
                 _signInData.value = signInData.copy(authError = true)
+                successCallback(false, exception)
             }
         }
     }

@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.composetemplate.navigation.Navigator
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
@@ -22,6 +23,7 @@ import com.example.composetemplate.presentation.screens.entry_screens.login.Auth
 import com.example.composetemplate.ui.theme.LoginScreenColor
 import com.example.composetemplate.utils.Constants
 import com.example.composetemplate.utils.Constants.Companion.LoginText
+import com.example.composetemplate.utils.SuccessCallback
 
 val registerFields = listOf(
     AuthTextFieldsEnum.FULL_NAME,
@@ -34,7 +36,8 @@ val registerFields = listOf(
 fun RegisterScreen(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel,
-    onLoginClicked: () -> Unit
+    onLoginClicked: () -> Unit,
+    isRegisterSucceed: SuccessCallback
 ) {
 
     Column(
@@ -83,17 +86,14 @@ fun RegisterScreen(
                     isEnabled = viewModel.signupData.isValidRegisterPage,
                     text = LoginText
                 ) {
-                    viewModel.createEmailPasswordUser()
+                    viewModel.createEmailPasswordUser(isRegisterSucceed)
                 }
             }
             item {
                 Text(
                     modifier = modifier
                         .padding(top = 12.dp)
-                        .clickable {
-                            viewModel.logOut()
-                            onLoginClicked()
-                        },
+                        .clickable { onLoginClicked() },
                     text = "Already have an account? Login! ",
                     color = Color.White,
                     style = MaterialTheme.typography.labelLarge

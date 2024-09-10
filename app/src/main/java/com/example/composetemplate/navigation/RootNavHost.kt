@@ -50,7 +50,7 @@ fun NavGraphBuilder.entryNavGraph(
 ) {
     navigation<EntryGraph>(startDestination = EntryScreens.Splash) {
         composable<EntryScreens.Splash> { SplashScreen(navigator) }
-        composable<EntryScreens.Auth> { AuthScreen() }
+        composable<EntryScreens.Auth> { AuthScreen(navigator) }
 
         //todo: this is in comment to have a reference to pass data between screens
         //todo: SHON: delete after I pass data to different screen
