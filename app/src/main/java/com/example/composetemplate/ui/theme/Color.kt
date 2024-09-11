@@ -14,6 +14,12 @@ val Red = Color(0xFFD81533)
 val Orange = Color(0xFFFF9800)
 val White = Color(0xFFFFFFFF)
 
+//Login
+val LoginScreenColor = Color(0xFF222325)
+val LoginTextFieldColor = Color(0xFF37383A)
+val LoginButtonColorDisable = Color(0xABFFFFFF)
+val LoginColorEnable = Color(0xFF01B3BD)
+
 /**
  * The Immutable annotation is used for optimization. For more information,
  * @see Immutable
