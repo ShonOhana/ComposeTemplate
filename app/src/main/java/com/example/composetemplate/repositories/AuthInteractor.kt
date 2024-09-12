@@ -4,9 +4,12 @@ import com.example.composetemplate.data.models.local_models.LoginParameterizable
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.models.server_models.PermissionType
+import com.example.composetemplate.data.remote.responses.ExampleResponse
 import com.example.composetemplate.managers.NetworkManager
 import com.example.composetemplate.utils.LoginCallback
+import com.example.composetemplate.utils.SuccessCallback
 import com.example.composetemplate.utils.extensions.isSuccessful
+import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 
 /**
@@ -58,6 +61,16 @@ class AuthInteractor(
         val request = loginRepository.createOrUpdateUserRequest(user)
         val response = (networkManager.sendRequest(request) as? HttpResponse)
         return response?.isSuccessful() == true
+    }
+
+    fun getUserAccessToken(successCallback: SuccessCallback) =  loginRepository.getUserAccessToken(successCallback)
+
+    /** Get user from database */
+    suspend fun getUser(): User? {
+        val request = loginRepository.getUserRequest()
+        (networkManager.sendRequest(request) as? HttpResponse).let { response ->
+           return response?.body<User>()
+        }
     }
 
     fun logOut() = loginRepository.logOut()

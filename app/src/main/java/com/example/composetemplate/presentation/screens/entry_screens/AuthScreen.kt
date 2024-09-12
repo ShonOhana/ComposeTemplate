@@ -9,6 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.composetemplate.navigation.MainScreens
+import com.example.composetemplate.navigation.Navigator
 import com.example.composetemplate.presentation.common.FullScreenProgressBar
 import com.example.composetemplate.presentation.common.LoginPageHeader
 import com.example.composetemplate.presentation.screens.entry_screens.login.LoginScreen
@@ -20,9 +22,11 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AuthScreen(
+    navigator: Navigator,
     authViewModel: AuthViewModel = koinViewModel()
 ){
     var currentScreen by remember { mutableStateOf(AuthScreenState.Login) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -35,11 +39,19 @@ fun AuthScreen(
         when (currentScreen) {
             AuthScreenState.Login -> LoginScreen(
                 viewModel = authViewModel,
-                onRegisterClicked = { currentScreen = AuthScreenState.Register }
+                onRegisterClicked = { currentScreen = AuthScreenState.Register },
+                isLoginSucceed = { succeess, exception ->
+                    if (succeess && exception == null)
+                        navigator.navigate(MainScreens.Home)
+                }
             )
             AuthScreenState.Register -> RegisterScreen(
                 viewModel = authViewModel,
-                onLoginClicked = { currentScreen = AuthScreenState.Login }
+                onLoginClicked = { currentScreen = AuthScreenState.Login },
+                isRegisterSucceed = { succeess, exception ->
+                    if (succeess && exception == null)
+                        navigator.navigate(MainScreens.Home)
+                }
             )
         }
     }
