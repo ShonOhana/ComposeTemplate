@@ -15,12 +15,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.composetemplate.navigation.MainScreens
+import com.example.composetemplate.navigation.Navigator
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
 import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
 import com.example.composetemplate.ui.theme.LoginScreenColor
 import com.example.composetemplate.utils.Constants
 import com.example.composetemplate.utils.Constants.Companion.LoginText
+import com.example.composetemplate.utils.SuccessCallback
 
 val loginFields = listOf(
     AuthTextFieldsEnum.EMAIL,
@@ -31,7 +34,8 @@ val loginFields = listOf(
 fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel,
-    onRegisterClicked: () -> Unit
+    onRegisterClicked: () -> Unit,
+    isLoginSucceed: SuccessCallback
 ) {
 
     LazyColumn(
@@ -71,7 +75,7 @@ fun LoginScreen(
                 isEnabled = viewModel.signInData.isValidLoginPage,
                 text = LoginText
             ) {
-                viewModel.signInEmailAndPassword()
+                viewModel.signInEmailAndPassword(isLoginSucceed)
             }
         }
         item {
