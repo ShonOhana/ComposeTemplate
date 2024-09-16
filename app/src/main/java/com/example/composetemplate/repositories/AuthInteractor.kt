@@ -47,7 +47,7 @@ class AuthInteractor(
             LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD -> {
                 val email = (loginParams as? NonSocialLoginParameter)?.email ?: ""
                 val password = loginParams.password
-                val user = User(email = email, fullName = "Shon", permissionType = PermissionType.DEVELOPER.name.lowercase())
+                val user = User(email = email, fullName = "", permissionType = PermissionType.DEVELOPER.name.lowercase())
                 loginRepository.signInEmailPasswordUser(user,password, loginCallback)
             }
         }
