@@ -13,12 +13,10 @@ val Green = Color(0xFF2CB631)
 val Red = Color(0xFFD81533)
 val Orange = Color(0xFFFF9800)
 val White = Color(0xFFFFFFFF)
-
-//Login
-val LoginScreenColor = Color(0xFF222325)
-val LoginTextFieldColor = Color(0xFF37383A)
-val LoginButtonColorDisable = Color(0xABFFFFFF)
-val LoginColorEnable = Color(0xFF01B3BD)
+val DarkBlue222325 = Color(0xFF222325)
+val Gray37383A = Color(0xFF37383A)
+val Gray67 = Color(0xABFFFFFF)
+val LightBlue01B3BD = Color(0xFF01B3BD)
 
 /**
  * The Immutable annotation is used for optimization. For more information,
@@ -32,5 +30,12 @@ val LoginColorEnable = Color(0xFF01B3BD)
 data class CustomColorsPalette(
      val success: Color = Green,
      val error: Color = Red,
-     val title: Color = Color.Unspecified
+     val loginScreen: Color = DarkBlue222325,
+     val loginTextField: Color = Gray37383A,
+     val loginButtonDisable: Color = Gray67,
+     val loginEnable: Color = LightBlue01B3BD,
+     val editTextContainer: Color = Color.DarkGray,
+     val text: Color = White,
+     val title: Color = Color.Unspecified,
+     val cursor: Color = Color.Unspecified,
 )

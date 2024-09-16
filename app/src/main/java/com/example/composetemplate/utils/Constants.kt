@@ -44,13 +44,15 @@ class Constants {
 
 
         //Strings
-        const val LoginText = "Login"
-        const val RegisterText = "Don't have an account? Register!"
-        const val AuthenticationErrorText = "Authentication error - Please see all errors related to firebase auth"
-        const val EmailText = "Email"
-        const val PasswordText = "Password"
-        const val FullNameText = "Full Name"
-        const val ComfirmPasswordText = "Confirm Password"
+        const val LOGIN_TEXT = "Login"
+        const val REGISTER_TEXT = "Don't have an account? Register!"
+        const val AUTHENTICATION_ERROR_TEXT = "Authentication error - Please see all errors related to firebase auth"
+        const val EMAIL_TEXT = "Email"
+        const val PASSWORD_TEXT = "Password"
+        const val FULL_NAME_TEXT = "Full Name"
+        const val CONFIRM_PASSWORD_TEXT = "Confirm Password"
+        const val HAVE_ACCOUNT_TEXT = "Already have an account? Login!"
+        const val AUTH_WITH_GOOGLE = "with Google"
 
     }
 }

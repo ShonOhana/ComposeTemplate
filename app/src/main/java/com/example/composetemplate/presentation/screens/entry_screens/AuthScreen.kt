@@ -17,7 +17,7 @@ import com.example.composetemplate.presentation.screens.entry_screens.login.Logi
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthScreenState
 import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
 import com.example.composetemplate.presentation.screens.entry_screens.register.RegisterScreen
-import com.example.composetemplate.ui.theme.LoginScreenColor
+import com.example.composetemplate.ui.theme.CustomTheme
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -30,7 +30,7 @@ fun AuthScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(LoginScreenColor),
+            .background(CustomTheme.colors.loginScreen),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -40,16 +40,16 @@ fun AuthScreen(
             AuthScreenState.Login -> LoginScreen(
                 viewModel = authViewModel,
                 onRegisterClicked = { currentScreen = AuthScreenState.Register },
-                isLoginSucceed = { succeess, exception ->
-                    if (succeess && exception == null)
+                isLoginSucceed = { success, exception ->
+                    if (success && exception == null)
                         navigator.navigate(MainScreens.Home)
                 }
             )
             AuthScreenState.Register -> RegisterScreen(
                 viewModel = authViewModel,
                 onLoginClicked = { currentScreen = AuthScreenState.Login },
-                isRegisterSucceed = { succeess, exception ->
-                    if (succeess && exception == null)
+                isRegisterSucceed = { success, exception ->
+                    if (success && exception == null)
                         navigator.navigate(MainScreens.Home)
                 }
             )

@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -27,16 +28,6 @@ private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
 )
 
 private val LocalCustomTypography = staticCompositionLocalOf {
@@ -51,12 +42,25 @@ private val LocalCustomColorsPalette = staticCompositionLocalOf {
     CustomColorsPalette()
 }
 
+private val LocalCustomShapes = staticCompositionLocalOf {
+    CustomShapes()
+}
+
+private val localShapes = CustomShapes(
+    button = roundedCornerShapes.medium
+)
+
+/** In this example in light mode the title color will be set to orange and
+ * In dark mode it will set to white.
+* */
 private val LightCustomColorsPalette = CustomColorsPalette(
-    title = Orange
+    title = Orange,
+    cursor = Color.Black
 )
 
 private val DarkCustomColorsPalette = CustomColorsPalette(
-    title = White
+    title = White,
+    cursor = Color.White
 )
 
 @Composable
@@ -95,12 +99,13 @@ fun ComposeTemplateTheme(
 
     CompositionLocalProvider(
         LocalCustomColorsPalette provides localCustomColorScheme,
-        LocalCustomTypography provides localTypography
+        LocalCustomTypography provides localTypography,
+        LocalCustomShapes provides localShapes
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
-            shapes = shapes,
+            shapes = roundedCornerShapes,
             content = content
         )
     }
@@ -112,4 +117,7 @@ object CustomTheme {
 
     val typography: CustomTypography
         @Composable get() = LocalCustomTypography.current
+
+    val shapes: CustomShapes
+        @Composable get() = LocalCustomShapes.current
 }
