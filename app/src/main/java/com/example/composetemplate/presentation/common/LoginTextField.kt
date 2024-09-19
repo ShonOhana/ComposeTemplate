@@ -47,22 +47,22 @@ fun LoginTextField(
                     else {
                         if (!isValid) Color.Red else Color.Transparent
                     }
-                ), CustomTheme.shapes.textField
+                ), CustomTheme.shapes.roundedTextField
             ),
         value = text,
         onValueChange = onValueChange,
         placeholder = {
             Text(text = loginScreenEnum.getPlaceHolder(), color = CustomTheme.colors.text)
         },
-        shape = CustomTheme.shapes.textField,
+        shape = CustomTheme.shapes.roundedTextField,
         colors = TextFieldDefaults.colors(
             cursorColor = CustomTheme.colors.cursor,
             disabledIndicatorColor = Color.Transparent,
             errorIndicatorColor = CustomTheme.colors.error,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            unfocusedContainerColor = CustomTheme.colors.editTextContainer,
-            focusedContainerColor = CustomTheme.colors.editTextContainer,
+            unfocusedContainerColor = CustomTheme.colors.authEditTextContainer,
+            focusedContainerColor = CustomTheme.colors.authEditTextContainer,
             focusedTextColor = CustomTheme.colors.loginEnable,
             unfocusedTextColor = if (isValid) CustomTheme.colors.loginEnable else CustomTheme.colors.error
         ),

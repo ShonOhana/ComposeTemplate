@@ -22,7 +22,7 @@ fun FullScreenProgressBar(isLoading: Boolean) {
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
-                color = CustomTheme.colors.text,
+                color = CustomTheme.colors.progress,
                 strokeWidth = 4.dp
             )
         }
