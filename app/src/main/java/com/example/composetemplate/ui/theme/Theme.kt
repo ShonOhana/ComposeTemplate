@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -85,17 +86,7 @@ fun ComposeTemplateTheme(
         LightCustomColorsPalette
     }
 
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        /* Paint the status bar */
-        SideEffect {
-            ((view.context as? Activity)?.window)?.let { window ->
-                window.statusBarColor = colorScheme.primary.toArgb()
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
-                    isDarkMode
-            }
-        }
-    }
+    /* PaintStatusBar(color = localCustomColorScheme.success.toArgb()) */
 
     CompositionLocalProvider(
         LocalCustomColorsPalette provides localCustomColorScheme,
@@ -110,6 +101,23 @@ fun ComposeTemplateTheme(
         )
     }
 }
+
+
+@Composable
+private fun PaintStatusBar(color: Int, isDarkMode: Boolean = false) {
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        /* Paint the status bar */
+        SideEffect {
+            ((view.context as? Activity)?.window)?.let { window ->
+                window.statusBarColor = color
+                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
+                    isDarkMode
+            }
+        }
+    }
+}
+
 
 object CustomTheme {
     val colors: CustomColorsPalette
