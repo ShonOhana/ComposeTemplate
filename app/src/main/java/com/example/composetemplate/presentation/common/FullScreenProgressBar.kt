@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.composetemplate.ui.theme.CustomTheme
 
 @Composable
 fun FullScreenProgressBar(isLoading: Boolean) {
@@ -21,7 +22,7 @@ fun FullScreenProgressBar(isLoading: Boolean) {
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
-                color = Color.White, // Set color as needed
+                color = CustomTheme.colors.progress,
                 strokeWidth = 4.dp
             )
         }

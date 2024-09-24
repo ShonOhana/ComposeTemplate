@@ -21,6 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.composetemplate.R
+import com.example.composetemplate.ui.theme.CustomTheme
+import com.example.composetemplate.utils.Constants.Companion.AUTH_WITH_GOOGLE
 
 @Composable
 fun LoginPageHeader(
@@ -60,8 +62,8 @@ fun LoginPageHeader(
             Text(
                 modifier = modifier
                     .padding(top = 6.dp),
-                text = "with Google",
-                color = Color.White,
+                text = AUTH_WITH_GOOGLE,
+                color = CustomTheme.colors.text,
                 style = MaterialTheme.typography.labelLarge
             )
 

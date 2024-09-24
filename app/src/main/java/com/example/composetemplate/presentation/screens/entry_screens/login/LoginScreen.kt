@@ -15,14 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.composetemplate.navigation.MainScreens
-import com.example.composetemplate.navigation.Navigator
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
 import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
-import com.example.composetemplate.ui.theme.LoginScreenColor
+import com.example.composetemplate.ui.theme.CustomTheme
 import com.example.composetemplate.utils.Constants
-import com.example.composetemplate.utils.Constants.Companion.LoginText
+import com.example.composetemplate.utils.Constants.Companion.LOGIN_TEXT
 import com.example.composetemplate.utils.SuccessCallback
 
 val loginFields = listOf(
@@ -41,7 +39,7 @@ fun LoginScreen(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(LoginScreenColor),
+            .background(CustomTheme.colors.loginScreen),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -63,7 +61,7 @@ fun LoginScreen(
                 modifier = modifier
                     .padding(horizontal = 24.dp)
                     .graphicsLayer { alpha = if (viewModel.signInData.authError) 1f else 0f },
-                text = Constants.AuthenticationErrorText,
+                text = Constants.AUTHENTICATION_ERROR_TEXT,
                 color = Color.Red,
                 style = MaterialTheme.typography.labelMedium,
                 textAlign = TextAlign.Center
@@ -73,7 +71,7 @@ fun LoginScreen(
             LoginScreenButton(
                 modifier = modifier.padding(top = 12.dp),
                 isEnabled = viewModel.signInData.isValidLoginPage,
-                text = LoginText
+                text = LOGIN_TEXT
             ) {
                 viewModel.signInEmailAndPassword(isLoginSucceed)
             }
@@ -83,7 +81,7 @@ fun LoginScreen(
                 modifier = modifier
                     .padding(top = 12.dp)
                     .clickable { onRegisterClicked() },
-                text = Constants.RegisterText,
+                text = Constants.REGISTER_TEXT,
                 color = Color.White,
                 style = MaterialTheme.typography.labelLarge
             )

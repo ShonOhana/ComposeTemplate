@@ -47,8 +47,8 @@ fun HttpClientConfig<CIOEngineConfig>.handleErrors() {
                 NetworkExceptions.entries.forEach { exception ->
                     if (exception.code == statusCode) {
                         throw when (exception) {
-                            NetworkExceptions.UnauthorizedException -> BadRequestException()
-                            NetworkExceptions.BadRequestException -> UnauthorizedException()
+                            NetworkExceptions.UnauthorizedException -> UnauthorizedException()
+                            NetworkExceptions.BadRequestException -> BadRequestException()
                             NetworkExceptions.NotFoundException -> NotFoundException()
                             NetworkExceptions.TimeOutException -> TimeOutException()
                             NetworkExceptions.InternalServerErrorException -> InternalServerErrorException()

@@ -19,10 +19,10 @@ enum class AuthTextFieldsEnum {
 
     fun getPlaceHolder(): String{
         return when(this) {
-            EMAIL -> Constants.EmailText
-            PASSWORD -> Constants.PasswordText
-            FULL_NAME -> Constants.FullNameText
-            CONFIRM_PASSWORD -> Constants.ComfirmPasswordText
+            EMAIL -> Constants.EMAIL_TEXT
+            PASSWORD -> Constants.PASSWORD_TEXT
+            FULL_NAME -> Constants.FULL_NAME_TEXT
+            CONFIRM_PASSWORD -> Constants.CONFIRM_PASSWORD_TEXT
         }
     }
 

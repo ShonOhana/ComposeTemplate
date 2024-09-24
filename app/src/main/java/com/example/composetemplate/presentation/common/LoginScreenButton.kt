@@ -9,11 +9,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.composetemplate.ui.theme.LoginButtonColorDisable
-import com.example.composetemplate.ui.theme.LoginColorEnable
+import com.example.composetemplate.ui.theme.CustomTheme
 
 
 @Composable
@@ -29,7 +27,7 @@ fun LoginScreenButton(
             .padding(horizontal = 24.dp)
             .height(52.dp),
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = if (!isEnabled) LoginButtonColorDisable else LoginColorEnable
+            containerColor = if (!isEnabled) CustomTheme.colors.loginButtonDisable else CustomTheme.colors.loginEnable
         ),
         onClick = {
             if (isEnabled) {
@@ -39,7 +37,7 @@ fun LoginScreenButton(
     ) {
         Text(
             text = text,
-            color = Color.White,
+            color = CustomTheme.colors.text,
             style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
         )
     }

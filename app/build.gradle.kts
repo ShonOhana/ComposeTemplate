@@ -117,7 +117,4 @@ dependencies {
 
     /* DataStore */
     implementation(libs.androidx.datastore.preferences.core)
-
-    //Accompanist
-    implementation(libs.accompanist.systemuicontroller)
 }

@@ -2,13 +2,11 @@ package com.example.composetemplate.presentation.common
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -22,7 +20,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
-import com.example.composetemplate.ui.theme.LoginColorEnable
+import com.example.composetemplate.ui.theme.CustomTheme
 
 @Composable
 fun LoginTextField(
@@ -49,24 +47,24 @@ fun LoginTextField(
                     else {
                         if (!isValid) Color.Red else Color.Transparent
                     }
-                ), CircleShape
+                ), CustomTheme.shapes.roundedTextField
             ),
         value = text,
         onValueChange = onValueChange,
         placeholder = {
-            Text(text = loginScreenEnum.getPlaceHolder(), color = Color.White)
+            Text(text = loginScreenEnum.getPlaceHolder(), color = CustomTheme.colors.text)
         },
-        shape = CircleShape,
+        shape = CustomTheme.shapes.roundedTextField,
         colors = TextFieldDefaults.colors(
-            cursorColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+            cursorColor = CustomTheme.colors.cursor,
             disabledIndicatorColor = Color.Transparent,
-            errorIndicatorColor = Color.Red,
+            errorIndicatorColor = CustomTheme.colors.error,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            unfocusedContainerColor = Color.DarkGray,
-            focusedContainerColor = Color.DarkGray,
-            focusedTextColor = LoginColorEnable,
-            unfocusedTextColor = if (isValid) LoginColorEnable else Color.Red
+            unfocusedContainerColor = CustomTheme.colors.authEditTextContainer,
+            focusedContainerColor = CustomTheme.colors.authEditTextContainer,
+            focusedTextColor = CustomTheme.colors.loginEnable,
+            unfocusedTextColor = if (isValid) CustomTheme.colors.loginEnable else CustomTheme.colors.error
         ),
         singleLine = true,
         keyboardOptions = loginScreenEnum.getKeyboardOptions(isLastEditText),
