@@ -90,4 +90,19 @@ class FirebaseDataSource() : AuthDBServiceable {
         auth.signOut()
     }
 
+    /** reset password using user email
+     * this method send link (maybe to spam) to your email to reset your password
+     * if task is successful you go to signInFragment to login with your new password you set from your link
+     */
+    fun resetPassword(email: String, successCallback: SuccessCallback) {
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    successCallback(true,null)
+                }else {
+                    successCallback(false,task.exception)
+                }
+            }
+    }
+
 }

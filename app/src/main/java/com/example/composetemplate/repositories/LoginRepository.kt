@@ -66,4 +66,7 @@ class LoginRepository(
     //logOut user in firebase
     fun logOut() = firebaseDataSource.logOut()
 
+    // reset password
+    fun resetPassword(email: String, successCallback: SuccessCallback) = firebaseDataSource.resetPassword(email,successCallback)
+
 }

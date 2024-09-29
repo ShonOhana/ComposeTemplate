@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -29,7 +30,8 @@ fun LoginTextField(
     loginScreenEnum: AuthTextFieldsEnum,
     isValid: Boolean,
     onValueChange: (String) -> Unit,
-    isLastEditText: Boolean = false
+    isLastEditText: Boolean = false,
+    leadingIcon: @Composable (() -> Unit)? = null,
 ) {
     var isFocused by remember { mutableStateOf(false) }
     OutlinedTextField(
@@ -39,7 +41,6 @@ fun LoginTextField(
             .onFocusChanged { focusState ->
                 isFocused = focusState.isFocused
             }
-            .padding(horizontal = 24.dp)
             .border(
                 border = BorderStroke(
                     width = 1.dp,
@@ -54,6 +55,7 @@ fun LoginTextField(
         placeholder = {
             Text(text = loginScreenEnum.getPlaceHolder(), color = CustomTheme.colors.text)
         },
+        leadingIcon = leadingIcon,
         shape = CustomTheme.shapes.roundedTextField,
         colors = TextFieldDefaults.colors(
             cursorColor = CustomTheme.colors.cursor,

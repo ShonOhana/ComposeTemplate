@@ -24,7 +24,6 @@ fun LoginScreenButton(
     ElevatedButton(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
             .height(52.dp),
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = if (!isEnabled) CustomTheme.colors.loginButtonDisable else CustomTheme.colors.loginEnable

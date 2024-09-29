@@ -58,7 +58,7 @@ fun RegisterScreen(
             items(registerFields.size) { index ->
                 val loginField = registerFields[index]
                 LoginTextField(
-                    modifier = Modifier,
+                    modifier = Modifier.padding(horizontal = 24.dp),
                     text = viewModel.setText(loginField, AuthScreenState.Register),
                     loginScreenEnum = loginField,
                     isValid = viewModel.validateEditText(loginField, AuthScreenState.Register),
@@ -82,7 +82,7 @@ fun RegisterScreen(
             }
             item {
                 LoginScreenButton(
-                    modifier = modifier.padding(top = 12.dp),
+                    modifier = modifier.padding(top = 12.dp).padding(horizontal = 24.dp),
                     isEnabled = viewModel.signupData.isValidRegisterPage,
                     text = LOGIN_TEXT
                 ) {

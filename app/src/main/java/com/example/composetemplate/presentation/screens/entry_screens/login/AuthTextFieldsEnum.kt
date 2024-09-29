@@ -15,7 +15,7 @@ enum class AuthScreenState {
 }
 
 enum class AuthTextFieldsEnum {
-    EMAIL, PASSWORD, FULL_NAME, CONFIRM_PASSWORD ;
+    EMAIL, PASSWORD, FULL_NAME, CONFIRM_PASSWORD, FORGOT_PASSWORD ;
 
     fun getPlaceHolder(): String{
         return when(this) {
@@ -23,11 +23,13 @@ enum class AuthTextFieldsEnum {
             PASSWORD -> Constants.PASSWORD_TEXT
             FULL_NAME -> Constants.FULL_NAME_TEXT
             CONFIRM_PASSWORD -> Constants.CONFIRM_PASSWORD_TEXT
+            FORGOT_PASSWORD -> Constants.FORGOT_PASSWORD_TEXT
         }
     }
 
     fun getKeyboardOptions(isLastEditText: Boolean): KeyboardOptions {
         return when(this) {
+            FORGOT_PASSWORD,
             EMAIL -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
             CONFIRM_PASSWORD,
             PASSWORD -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password, imeAction = if (isLastEditText) ImeAction.Done else ImeAction.Next)
@@ -37,6 +39,7 @@ enum class AuthTextFieldsEnum {
 
     fun getVisualTransformation(): VisualTransformation {
         return when(this) {
+            FORGOT_PASSWORD,
             FULL_NAME,
             EMAIL -> VisualTransformation.None
             CONFIRM_PASSWORD,

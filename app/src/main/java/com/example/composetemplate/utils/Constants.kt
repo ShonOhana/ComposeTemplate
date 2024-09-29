@@ -53,6 +53,8 @@ class Constants {
         const val CONFIRM_PASSWORD_TEXT = "Confirm Password"
         const val HAVE_ACCOUNT_TEXT = "Already have an account? Login!"
         const val AUTH_WITH_GOOGLE = "with Google"
-
+        const val FORGOT_PASSWORD_TEXT = "Enter your email"
+        const val FORGOT_PASSWORD_TITLE = "Forgot Password"
+        const val FORGOT_PASSWORD_BUTTON_TEXT = "Send email"
     }
 }

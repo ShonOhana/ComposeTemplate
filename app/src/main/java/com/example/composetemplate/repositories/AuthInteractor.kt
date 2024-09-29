@@ -75,4 +75,6 @@ class AuthInteractor(
 
     fun logOut() = loginRepository.logOut()
 
+    fun resetPassword(email: String, successCallback: SuccessCallback) = loginRepository.resetPassword(email,successCallback)
+
 }

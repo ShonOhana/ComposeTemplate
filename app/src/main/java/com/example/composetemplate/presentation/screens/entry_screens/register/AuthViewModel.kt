@@ -40,11 +40,18 @@ class AuthViewModel(
     private val _isProgressVisible = mutableStateOf(false)
     val isProgressVisible: Boolean by _isProgressVisible
 
+    //forgot password dialog visibility
+    private val _isForgotDialogVisible = mutableStateOf(false)
+    val isForgotDialogVisible: Boolean by _isForgotDialogVisible
+
     //authentication data parameters according to loginScreen statement
     private val _signInData = mutableStateOf(SignInData())
     val signInData: SignInData by _signInData
     private val _signupData = mutableStateOf(SignUpData())
     val signupData: SignUpData by _signupData
+    private val _forgotPasswordMail = mutableStateOf("")
+    val forgotPasswordMail: String by _forgotPasswordMail
+
 
     init {
         initPageState()
@@ -158,6 +165,7 @@ class AuthViewModel(
                     PASSWORD -> signInData.password
                     FULL_NAME -> ""  //do noting in sign in
                     CONFIRM_PASSWORD -> ""  //do noting in sign in
+                    AuthTextFieldsEnum.FORGOT_PASSWORD -> forgotPasswordMail
                 }
             }
             AuthScreenState.Register -> {
@@ -166,6 +174,7 @@ class AuthViewModel(
                     PASSWORD -> signupData.password
                     FULL_NAME -> signupData.fullName
                     CONFIRM_PASSWORD -> signupData.confirmPassword
+                    AuthTextFieldsEnum.FORGOT_PASSWORD -> ""
                 }
             }
         }
@@ -175,6 +184,7 @@ class AuthViewModel(
          return when (authScreenState) {
              AuthScreenState.Login -> {
                  when (authTextFieldsEnum) {
+                     AuthTextFieldsEnum.FORGOT_PASSWORD,
                     EMAIL -> signInData.isEmailValid
                     PASSWORD -> signInData.isPasswordValid
                     FULL_NAME -> false
@@ -183,6 +193,7 @@ class AuthViewModel(
             }
              AuthScreenState.Register -> {
                  when (authTextFieldsEnum) {
+                     AuthTextFieldsEnum.FORGOT_PASSWORD,
                     EMAIL -> signupData.isEmailValid
                     PASSWORD -> signupData.isPasswordValid
                     FULL_NAME -> signupData.isFullNameValid
@@ -201,6 +212,7 @@ class AuthViewModel(
                     PASSWORD -> _signInData.value = signInData.copy(password = newValue)
                     FULL_NAME -> { }
                     CONFIRM_PASSWORD -> { }
+                    AuthTextFieldsEnum.FORGOT_PASSWORD -> _forgotPasswordMail.value = newValue
                 }
             }
             AuthScreenState.Register -> {
@@ -209,9 +221,14 @@ class AuthViewModel(
                     EMAIL -> _signupData.value = signupData.copy(email = newValue)
                     PASSWORD -> _signupData.value = signupData.copy(password = newValue)
                     CONFIRM_PASSWORD -> _signupData.value = signupData.copy(confirmPassword = newValue)
+                    AuthTextFieldsEnum.FORGOT_PASSWORD -> {}
                 }
             }
         }
+    }
+
+    fun setForgotDialogVisibility(isVisible: Boolean) {
+        _isForgotDialogVisible.value = isVisible
     }
 
     /** Logout fun to use whenever we need to logout
@@ -220,4 +237,13 @@ class AuthViewModel(
      * */
     fun logOut() = authInteractor.logOut()
 
+    fun resetPassword(email: String) {
+        uiAuthState.value = UIState.Loading()
+        authInteractor.resetPassword(email) { success, exception ->
+            if (success && exception == null)
+                uiAuthState.value = UIState.Success(true)
+            else
+                uiAuthState.value = UIState.Error(exception?.message)
+        }
+    }
 }
