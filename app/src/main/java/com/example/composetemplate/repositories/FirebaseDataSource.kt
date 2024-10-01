@@ -20,9 +20,16 @@ class FirebaseDataSource() : AuthDBServiceable {
      */
     //auth instance
     var auth: FirebaseAuth = Firebase.auth
+
+    // TODO: create tokens provider
     private var accessToken: String = ""
 
     //initialize the access token for the firebase network call
+    // TODO: move the token logic to the authenticate or something
+    // todo saving the accessToken may cause permission denaied error . For example if the token is valid for 5 minutes
+    // so when we will send request after 5 minutes so accessToken.isEmpty() will return false but the token is not valid
+    // so the request will failed. we need to create mechanise that refresh the token if the token is not valid
+
     private fun getFirebaseUserAccessToken(successCallback: SuccessCallback) {
         if (accessToken.isEmpty()) {
             auth.currentUser?.let { currentUser ->

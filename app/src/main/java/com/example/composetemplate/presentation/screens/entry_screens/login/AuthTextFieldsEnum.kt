@@ -3,6 +3,7 @@ package com.example.composetemplate.presentation.screens.entry_screens.login
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
@@ -33,7 +34,7 @@ enum class AuthTextFieldsEnum {
             EMAIL -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
             CONFIRM_PASSWORD,
             PASSWORD -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password, imeAction = if (isLastEditText) ImeAction.Done else ImeAction.Next)
-            FULL_NAME -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text,imeAction = ImeAction.Next)
+            FULL_NAME -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text,imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Words)
         }
     }
 

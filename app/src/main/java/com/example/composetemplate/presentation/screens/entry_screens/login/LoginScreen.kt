@@ -18,8 +18,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -32,6 +35,7 @@ import com.example.composetemplate.presentation.common.BaseNativeDialog
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
 import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
+import com.example.composetemplate.presentation.screens.entry_screens.register.registerFields
 import com.example.composetemplate.ui.theme.CustomTheme
 import com.example.composetemplate.utils.Constants
 import com.example.composetemplate.utils.Constants.Companion.FORGOT_PASSWORD_BUTTON_TEXT
@@ -51,6 +55,11 @@ fun LoginScreen(
     onRegisterClicked: () -> Unit,
     isLoginSucceed: SuccessCallback
 ) {
+    val focusRequestList = mutableListOf<FocusRequester>()
+    repeat(loginFields.indices.count()) {
+        focusRequestList.add(FocusRequester())
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -83,7 +92,8 @@ fun LoginScreen(
                             onValueChange = { newValue ->
                                 viewModel.onEvent(loginField, newValue, AuthScreenState.Login)
                             },
-                            isLastEditText = index == loginFields.size - 1
+                            isLastEditText = index == loginFields.size - 1,
+                            onNextFocusRequest = if (index < focusRequestList.size -1) focusRequestList[index + 1] else focusRequestList[index]
                         )
                     }
                     Text(

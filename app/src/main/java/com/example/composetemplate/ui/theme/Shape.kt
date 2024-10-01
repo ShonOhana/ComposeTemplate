@@ -36,5 +36,6 @@ val circle = CircleShape
 @Immutable
 data class CustomShapes(
     val button: Shape = circle,
-    val roundedTextField:Shape = circle
+    val roundedTextField:Shape = circle,
+    val roundedBaseNativeDialog:Shape = RoundedCornerShape(16.dp)
 )

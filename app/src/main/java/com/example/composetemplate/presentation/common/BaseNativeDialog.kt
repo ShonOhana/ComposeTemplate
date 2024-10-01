@@ -25,6 +25,7 @@ import com.example.composetemplate.R
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthScreenState
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
 import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
+import com.example.composetemplate.ui.theme.CustomTheme
 
 @Composable
 fun BaseNativeDialog(
@@ -37,8 +38,8 @@ fun BaseNativeDialog(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
-            shape = RoundedCornerShape(16.dp),
-            color = Color.White // White background
+            shape = CustomTheme.shapes.roundedBaseNativeDialog,
+            color = CustomTheme.colors.nativeDialogBackground
         ) {
             dialogContent()
         }

@@ -25,6 +25,7 @@ import com.example.composetemplate.utils.UIState
 import com.example.composetemplate.utils.tag
 import com.example.composetemplate.utils.type
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
@@ -85,6 +86,7 @@ class AuthViewModel(
         }
     }
 
+    //todo interact with the interactor only once ( you call authInteractor twice)
     fun createEmailPasswordUser(successCallback: SuccessCallback) {
         uiAuthState.value = UIState.Loading()
         val loginParams =
