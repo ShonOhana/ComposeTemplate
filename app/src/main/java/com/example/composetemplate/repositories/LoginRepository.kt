@@ -1,6 +1,7 @@
 package com.example.composetemplate.repositories
 
 import com.example.composetemplate.data.models.local_models.User
+import com.example.composetemplate.data.remote.base.BaseRequest
 import com.example.composetemplate.managers.NetworkManager
 import com.example.composetemplate.utils.LoginCallback
 import com.example.composetemplate.utils.SuccessCallback
@@ -10,7 +11,10 @@ import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-
+interface AuthDbServiceable {
+    fun createOrUpdateUser(user: User, loginCallback: LoginCallback)
+    fun getUser(loginCallback: LoginCallback)
+}
 /**
  *
  * In the MVVM architecture, the Repository layer acts as a mediator between the ViewModel and data sources.
@@ -18,81 +22,88 @@ import kotlinx.coroutines.launch
  * This class contain the functionality of all login auth types
  */
 class LoginRepository(
-    private val firebaseDataSource: FirebaseDataSource,
+    private val authDataSource: AuthDataSource,
     private val networkManager: NetworkManager,
     private val ioScope: CoroutineScope,
-) : AuthDBServiceable {
+): AuthDbServiceable {
+
+    enum class RequestType {
+        CREATE_USER, GET_USER
+    }
 
     /** create user by email and password */
-    fun createEmailPasswordUser(user: User, password: String, loginCallback: LoginCallback) {
-        if (user.email.isEmpty().not()) {
-            firebaseDataSource.auth.createUserWithEmailAndPassword(user.email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        // TODO: get token provider instead using only firebase
-                        firebaseDataSource.getFirebaseUserAccessToken { b, exception ->
-                            ioScope.launch {
-                                createOrUpdateUser(user, loginCallback)
-                            }
-                        }
-                    } else {
-                        loginCallback(null, task.exception)
-                    }
-                }
-        } else
-            loginCallback(null, Exception("email is empty"))
+    fun registerUser(user: User, password: String, loginCallback: LoginCallback) {
+        authDataSource.createUserWithEmailAndPassword(user, password) { createdUser, exception ->
+            if (createdUser != null && exception == null)
+                createOrUpdateUser(user, loginCallback)
+            else {
+                loginCallback(null, exception)
+            }
+        }
     }
 
     /** sign in user by email and password */
     fun signInEmailPasswordUser(user: User, password: String, loginCallback: LoginCallback) {
         if (user.email.isEmpty().not()) {
-            firebaseDataSource.auth.signInWithEmailAndPassword(user.email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        // TODO: get token provider instead using only firebase
-                        firebaseDataSource.getFirebaseUserAccessToken { b, exception ->
-                            ioScope.launch {
-                                createOrUpdateUser(user, loginCallback)
-                            }
-                        }
-                    }  else {
-                        loginCallback(null, task.exception)
-                    }
+            authDataSource.signInWithEmailAndPassword(user, password) { createdUser, exception ->
+                if (createdUser != null && exception == null)
+                    createOrUpdateUser(user, loginCallback)
+                else {
+                    loginCallback(null, exception)
                 }
+            }
         } else
             loginCallback(null, Exception("email is empty"))
     }
 
-    //logOut user in firebase
-    fun logOut() = firebaseDataSource.logOut()
+    fun logOut() = authDataSource.logout()
 
-    // reset password
-    fun resetPassword(email: String, successCallback: SuccessCallback) = firebaseDataSource.resetPassword(email,successCallback)
+    fun resetPassword(email: String, successCallback: SuccessCallback) = authDataSource.resetPassword(email,successCallback)
 
-    override suspend fun getUser(loginCallback: LoginCallback) {
-        // TODO: move to token provider so the scope will be good
-        firebaseDataSource.getFirebaseUserAccessToken { b, exception ->
-            ioScope.launch {
-                val request = firebaseDataSource.getUserRequest()
-                (networkManager.sendRequest(request) as? HttpResponse).let { response ->
-                    val user = response?.body<User>()
-                    if (user != null) loginCallback(user, null) else loginCallback(
-                        null,
-                        Exception()
-                    ) //todo: check exception
+    override fun getUser(loginCallback: LoginCallback) {
+        authDataSource.getUser { user, exception ->
+            if (exception == null) {
+                ioScope.launch {
+                    val baseRequest = createBaseRequest(RequestType.GET_USER, authDataSource, user) ?: return@launch
+                    val httpResponse = (networkManager.sendRequest(baseRequest) as? HttpResponse)
+                    httpResponse?.let { response ->
+                        val remoteUser = response.body<User>()
+                        loginCallback(remoteUser,null)
+                    } ?: run {
+                        loginCallback(null,Exception())// check exception
+                    }
                 }
-            }
+            } else loginCallback(null,exception)
         }
     }
 
-    /** Create or update in database */
-    override suspend fun createOrUpdateUser(user: User, loginCallback: LoginCallback) {
-        val request = firebaseDataSource.createOrUpdateUserRequest(user)
-        val response = (networkManager.sendRequest(request) as? HttpResponse)
-        val success = response?.isSuccessful() == true
-        if (success) loginCallback(user, null) else loginCallback(
-            null,
-            Exception()
-        ) //todo: check exception
+    override fun createOrUpdateUser(user: User, loginCallback: LoginCallback) {
+        ioScope.launch {
+            val baseRequest = createBaseRequest(RequestType.CREATE_USER, authDataSource, user) ?: return@launch
+            val httpResponse = (networkManager.sendRequest(baseRequest) as? HttpResponse)
+            val success = httpResponse?.isSuccessful() == true
+            if (success) loginCallback(user, null) else loginCallback(null, Exception())
+        }
+    }
+
+    /** This is base request to to use in our network call architecture.
+     * every class that implement AuthDataSource will demand here to fill the request */
+    private fun createBaseRequest(
+        requestType: RequestType,
+        authDataSource: AuthDataSource,
+        user: User?
+    ): BaseRequest? {
+        val baseRequest = when (authDataSource) {
+            is FirebaseDataSource -> {
+                when (requestType) {
+                    RequestType.CREATE_USER -> {
+                        if (user == null) return null
+                        authDataSource.createOrUpdateUserRequest(user)
+                    }
+                    RequestType.GET_USER -> authDataSource.getUserRequest()
+                }
+            }
+        }
+        return baseRequest
     }
 }

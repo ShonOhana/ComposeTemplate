@@ -4,14 +4,8 @@ import com.example.composetemplate.data.models.local_models.LoginParameterizable
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.models.server_models.PermissionType
-import com.example.composetemplate.data.remote.responses.ExampleResponse
-import com.example.composetemplate.managers.NetworkManager
 import com.example.composetemplate.utils.LoginCallback
 import com.example.composetemplate.utils.SuccessCallback
-import com.example.composetemplate.utils.extensions.isSuccessful
-import io.ktor.client.call.body
-import io.ktor.client.statement.HttpResponse
-import kotlin.math.log
 
 /**
  * @Interactor explanation:
@@ -25,6 +19,7 @@ import kotlin.math.log
  *  otherwise it will not work and the network calls will go to onFailure
  *  RECOMMENDATION: Add SHA1 key in firebase project settings, you need it for example, in google auth
  */
+
 
 class AuthInteractor(
     private val loginRepository: LoginRepository,
@@ -45,7 +40,7 @@ class AuthInteractor(
                 val email = (loginParams as? NonSocialLoginParameter)?.email ?: ""
                 val password = loginParams.password
                 val user = User(email = email, fullName = loginParams.fullName, permissionType = PermissionType.DEVELOPER.name.lowercase())
-                loginRepository.createEmailPasswordUser(user,password, loginCallback)
+                loginRepository.registerUser(user,password, loginCallback)
             }
             LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD -> {
                 val email = (loginParams as? NonSocialLoginParameter)?.email ?: ""
@@ -57,7 +52,7 @@ class AuthInteractor(
     }
 
     /** Get user from database */
-    suspend fun getUser(loginCallback: LoginCallback) = loginRepository.getUser(loginCallback)
+    fun getUser(loginCallback: LoginCallback) = loginRepository.getUser(loginCallback)
 
     fun logOut() = loginRepository.logOut()
 

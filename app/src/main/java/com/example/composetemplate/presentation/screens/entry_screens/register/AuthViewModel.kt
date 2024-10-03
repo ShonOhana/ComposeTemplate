@@ -28,7 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 
 class AuthViewModel(
@@ -104,7 +103,7 @@ class AuthViewModel(
         }
     }
 
-    suspend fun getUser(loginCallback: LoginCallback) {
+    fun getUser(loginCallback: LoginCallback) {
         authInteractor.getUser { user, exception ->
             viewModelScope.launch(Dispatchers.Main) {
                 if (user != null && exception == null)
