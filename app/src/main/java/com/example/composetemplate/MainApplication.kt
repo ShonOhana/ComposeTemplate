@@ -2,6 +2,7 @@ package com.example.composetemplate
 
 import android.app.Application
 import com.example.composetemplate.di.appModule
+import com.example.composetemplate.di.coroutineModule
 import com.example.composetemplate.di.databaseModule
 import com.example.composetemplate.di.managersModule
 import com.example.composetemplate.di.networkModule
@@ -22,6 +23,7 @@ class MainApplication : Application() {
             modules(
                 appModule,
                 networkModule,
+                coroutineModule,
                 repositoriesModule,
                 viewModelsModules,
                 managersModule,

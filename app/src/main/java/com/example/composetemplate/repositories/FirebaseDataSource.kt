@@ -1,8 +1,8 @@
 package com.example.composetemplate.repositories
 
 import com.example.composetemplate.data.models.local_models.User
+import com.example.composetemplate.data.remote.base.BaseRequest
 import com.example.composetemplate.data.remote.requests.FirebaseUserRequests
-import com.example.composetemplate.utils.LoginCallback
 import com.example.composetemplate.utils.SuccessCallback
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -13,7 +13,7 @@ import com.google.firebase.auth.auth
  * from various sources, such as remote APIs, local databases, or in-memory caches.
  * allowing the repository to seamlessly aggregate and supply data to the ViewModel without worrying about the underlying data origins or access mechanisms.
  */
-class FirebaseDataSource() : AuthDBServiceable {
+class FirebaseDataSource {
 
     /**
      *  Firebase DB Functionality
@@ -30,7 +30,7 @@ class FirebaseDataSource() : AuthDBServiceable {
     // so when we will send request after 5 minutes so accessToken.isEmpty() will return false but the token is not valid
     // so the request will failed. we need to create mechanise that refresh the token if the token is not valid
 
-    private fun getFirebaseUserAccessToken(successCallback: SuccessCallback) {
+    fun getFirebaseUserAccessToken(successCallback: SuccessCallback) {
         if (accessToken.isEmpty()) {
             auth.currentUser?.let { currentUser ->
                 currentUser.getIdToken(true).addOnCompleteListener { task ->
@@ -51,34 +51,8 @@ class FirebaseDataSource() : AuthDBServiceable {
         }
     }
 
-    //first we get the access token of firebase to get the user.
-    // if its ok we pass in the successCallback to pass the layer that have the network layer for server call.
-    // the naming get user its if there is a different wat to implement the interface that we dont need th access token
-    override fun getUser(successCallback: SuccessCallback) {
-        getFirebaseUserAccessToken { success, e ->
-            val id = auth.currentUser?.uid
-            if (!success || id.isNullOrEmpty()) {
-                successCallback(false, e)
-                return@getFirebaseUserAccessToken
-            }
-            successCallback(true,null)
-        }
-    }
-
-    //we fetch the access token of firebase and pass the user to the callback, to send the request to firebase
-    override fun createOrUpdateUser(user: User, loginCallback: LoginCallback) {
-        getFirebaseUserAccessToken { success, e ->
-            val id = auth.currentUser?.uid
-            if (!success || id.isNullOrEmpty()) {
-                loginCallback(null, e)
-                return@getFirebaseUserAccessToken
-            }
-            loginCallback(user, null)
-        }
-    }
-
     // the request for the network call to patch the user to realtime database
-    fun createOrUpdateUserRequestForFirebase(user: User): FirebaseUserRequests.CreateOrUpdateUser {
+    fun createOrUpdateUserRequest(user: User): BaseRequest {
         val queries = mutableMapOf<String, String>().apply {
             this["auth"] = this@FirebaseDataSource.accessToken
         }

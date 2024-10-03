@@ -5,6 +5,7 @@ import com.example.composetemplate.utils.LoginCallback
 import com.example.composetemplate.utils.SuccessCallback
 
 interface AuthDBServiceable {
-    fun getUser(successCallback: SuccessCallback)
-    fun createOrUpdateUser(user: User, loginCallback: LoginCallback)
+    /** Network call so i want it to be suspend and manage the threads */
+    suspend fun getUser(loginCallback: LoginCallback)
+    suspend fun createOrUpdateUser(user: User, loginCallback: LoginCallback)
 }

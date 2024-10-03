@@ -11,6 +11,7 @@ import com.example.composetemplate.utils.SuccessCallback
 import com.example.composetemplate.utils.extensions.isSuccessful
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
+import kotlin.math.log
 
 /**
  * @Interactor explanation:
@@ -27,7 +28,6 @@ import io.ktor.client.statement.HttpResponse
 
 class AuthInteractor(
     private val loginRepository: LoginRepository,
-    private val networkManager: NetworkManager
 ) {
 
     /** @LoginProvider make us to implement every auth type we would like to add*/
@@ -56,22 +56,8 @@ class AuthInteractor(
         }
     }
 
-    /** Create or update in database */
-    suspend fun createOrUpdateUserInDb(user: User): Boolean {
-        val request = loginRepository.createOrUpdateUserRequest(user)
-        val response = (networkManager.sendRequest(request) as? HttpResponse)
-        return response?.isSuccessful() == true
-    }
-
-    fun getUserAccessToken(successCallback: SuccessCallback) =  loginRepository.getUserAccessToken(successCallback)
-
     /** Get user from database */
-    suspend fun getUser(): User? {
-        val request = loginRepository.getUserRequest()
-        (networkManager.sendRequest(request) as? HttpResponse).let { response ->
-           return response?.body<User>()
-        }
-    }
+    suspend fun getUser(loginCallback: LoginCallback) = loginRepository.getUser(loginCallback)
 
     fun logOut() = loginRepository.logOut()
 
