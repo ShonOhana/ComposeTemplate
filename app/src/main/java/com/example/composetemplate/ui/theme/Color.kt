@@ -36,6 +36,7 @@ data class CustomColorsPalette(
      val loginEnable: Color = LightBlue01B3BD,
      val authEditTextContainer: Color = Color.DarkGray,
      val text: Color = White,
+     val nativeDialogBackground: Color = White,
      val progress: Color = White,
      val title: Color = Color.Unspecified,
      val cursor: Color = Color.Unspecified,

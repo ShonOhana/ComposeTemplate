@@ -11,7 +11,7 @@ import com.example.composetemplate.utils.exceptions.UnauthorizedException
 /** This class manages all networking operations.
 In our project, we anticipate the existence of multiple networking classes tailored for specific services such as FirebaseNetworking, AWSNetworking, and others.
 Each networking class is expected to inherit from BaseNetworking and implement the ServerAuthenticator interface */
-//class Networking(private val application: Context) : BaseNetworking(), ServerAuthenticator {
+
 class Networking(private val application: Context) : BaseNetworking(), ServerAuthenticator {
 
     override val baseUrl: String = Constants.BASE_URL

@@ -10,7 +10,7 @@ sealed class FirebaseUserRequests {
     class CreateOrUpdateUser(
         override val method: HttpMethod = HttpMethod.Patch,
         override val path: String? = "users/${Firebase.auth.uid}.json",
-        override val queries: MutableMap<String, String>,
+        override val queries: MutableMap<String, String>? = null,
         override val headers: MutableMap<String, String>? = null,
         override val body: Any?,
         override val timeout: Long? = null,
@@ -20,7 +20,7 @@ sealed class FirebaseUserRequests {
     class GetUser(
         override val method: HttpMethod = HttpMethod.Get,
         override val path: String? = "users/${Firebase.auth.uid}.json",
-        override val queries: MutableMap<String, String>,
+        override val queries: MutableMap<String, String>? = null,
         override val headers: MutableMap<String, String>? = null,
         override val body: Any? = null,
         override val timeout: Long? = null,

@@ -4,13 +4,13 @@ import com.example.composetemplate.data.remote.requests.ExampleRequests
 import com.example.composetemplate.data.remote.responses.ExampleResponse
 import com.example.composetemplate.data.local.dao.TestDao
 import com.example.composetemplate.data.models.local_models.Test
-import com.example.composetemplate.managers.NetworkManager
+import com.example.composetemplate.managers.MainNetworkManager
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class TestRepository(private val networkManager: NetworkManager, private val testDao: TestDao) {
+class TestRepository(private val networkManager: MainNetworkManager, private val testDao: TestDao) {
 
     fun getData(): Flow<ExampleResponse?> {
         return flow {
