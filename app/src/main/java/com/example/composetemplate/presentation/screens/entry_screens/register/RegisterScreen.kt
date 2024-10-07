@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -27,6 +28,7 @@ import com.example.composetemplate.utils.Constants
 import com.example.composetemplate.utils.Constants.Companion.HAVE_ACCOUNT_TEXT
 import com.example.composetemplate.utils.Constants.Companion.LOGIN_TEXT
 import com.example.composetemplate.utils.SuccessCallback
+import kotlinx.coroutines.launch
 
 val registerFields = listOf(
     AuthTextFieldsEnum.FULL_NAME,

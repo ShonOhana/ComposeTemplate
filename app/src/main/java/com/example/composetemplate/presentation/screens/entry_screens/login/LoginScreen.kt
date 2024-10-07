@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -26,6 +27,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -42,6 +44,7 @@ import com.example.composetemplate.utils.Constants.Companion.FORGOT_PASSWORD_BUT
 import com.example.composetemplate.utils.Constants.Companion.FORGOT_PASSWORD_TITLE
 import com.example.composetemplate.utils.Constants.Companion.LOGIN_TEXT
 import com.example.composetemplate.utils.SuccessCallback
+import kotlinx.coroutines.launch
 
 val loginFields = listOf(
     AuthTextFieldsEnum.EMAIL,
@@ -55,6 +58,9 @@ fun LoginScreen(
     onRegisterClicked: () -> Unit,
     isLoginSucceed: SuccessCallback
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val scope = rememberCoroutineScope()
+
     val focusRequestList = mutableListOf<FocusRequester>()
     repeat(loginFields.indices.count()) {
         focusRequestList.add(FocusRequester())
@@ -114,7 +120,10 @@ fun LoginScreen(
                         isEnabled = viewModel.signInData.isValidLoginPage,
                         text = LOGIN_TEXT
                     ) {
-                        viewModel.signInEmailAndPassword(isLoginSucceed)
+                        scope.launch {
+                            keyboardController?.hide()
+                            viewModel.signInEmailAndPassword(isLoginSucceed)
+                        }
                     }
                     Text(
                         modifier = Modifier
@@ -210,3 +219,4 @@ fun ForgotPasswordDialog(
         }
     }
 }
+

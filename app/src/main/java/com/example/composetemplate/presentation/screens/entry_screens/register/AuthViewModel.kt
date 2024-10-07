@@ -5,31 +5,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
-import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.CONFIRM_PASSWORD
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.EMAIL
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.FULL_NAME
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.PASSWORD
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthScreenState
-import com.example.composetemplate.presentation.screens.entry_screens.login.BaseAuthScreenData
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignInData
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpData
 import com.example.composetemplate.repositories.AuthInteractor
-import com.example.composetemplate.utils.Constants
 import com.example.composetemplate.utils.LoginCallback
 import com.example.composetemplate.utils.LoginProvider
-import com.example.composetemplate.utils.LogsManager
 import com.example.composetemplate.utils.SuccessCallback
 import com.example.composetemplate.utils.UIState
-import com.example.composetemplate.utils.tag
-import com.example.composetemplate.utils.type
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-
+/**
+ * NOTE: In this class we use Firebase auth that work with old callback and does not support coroutines.
+ * So in our auth functions here is open new coroutine to switch the dispatcher to main thread
+ * because I could not use regular suspend fun that call inside vieModelScope because this old callbacks
+ * not support coroutines
+ * */
 class AuthViewModel(
     private val authInteractor: AuthInteractor
 ) : ViewModel() {
@@ -82,34 +81,44 @@ class AuthViewModel(
     }
 
     fun createEmailPasswordUser(successCallback: SuccessCallback) {
-        uiAuthState.value = UIState.Loading()
-        val loginParams = NonSocialLoginParameter(signupData.email, signupData.password, signupData.fullName)
-        authInteractor.login(
-            LoginProvider.REGISTER_WITH_EMAIL_AND_PASSWORD,
-            loginParams
-        ) { user, exception ->
-            viewModelScope.launch(Dispatchers.Main) { /** Move to main thread after io thread in network call of login */
-                if (user != null && exception == null) {
-                    _signupData.value = signupData.copy(authError = false)
-                    uiAuthState.value = UIState.Success(true)
-                    successCallback(true, null)
-                }
-                else {
-                    uiAuthState.value = UIState.Error(exception?.message)
-                    _signupData.value = signupData.copy(authError = true)
-                    successCallback(false, exception)
+        viewModelScope.launch {
+            uiAuthState.value = UIState.Loading()
+            val loginParams =
+                NonSocialLoginParameter(signupData.email, signupData.password, signupData.fullName)
+            // Get data from the repository (IO scope)
+            authInteractor.login(
+                LoginProvider.REGISTER_WITH_EMAIL_AND_PASSWORD,
+                loginParams
+            ) { user, exception ->
+                viewModelScope.launch {
+                    // Switch to Main dispatcher to update the UI
+                    withContext(Dispatchers.Main) {
+                        if (user != null && exception == null) {
+                            _signupData.value = signupData.copy(authError = false)
+                            uiAuthState.value = UIState.Success(true)
+                            successCallback(true, null)
+                        } else {
+                            uiAuthState.value = UIState.Error(exception?.message)
+                            _signupData.value = signupData.copy(authError = true)
+                            successCallback(false, exception)
+                        }
+                    }
                 }
             }
         }
     }
 
     fun getUser(loginCallback: LoginCallback) {
+        // Get data from the repository (IO scope)
         authInteractor.getUser { user, exception ->
-            viewModelScope.launch(Dispatchers.Main) {
-                if (user != null && exception == null)
-                    loginCallback(user, null)
-                else
-                    loginCallback(null, exception)
+            viewModelScope.launch {
+                // Switch to Main dispatcher to update the UI
+                withContext(Dispatchers.Main) {
+                    if (user != null && exception == null)
+                        loginCallback(user, null)
+                    else
+                        loginCallback(null, exception)
+                }
             }
         }
     }
@@ -117,20 +126,23 @@ class AuthViewModel(
     fun signInEmailAndPassword(successCallback: SuccessCallback) {
         uiAuthState.value = UIState.Loading()
         val loginParams = NonSocialLoginParameter(signInData.email, signInData.password)
+        // Get data from the repository (IO scope)
         authInteractor.login(
             LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD,
             loginParams
         ) { user, exception ->
-            viewModelScope.launch(Dispatchers.Main) { /** Move to main thread after io thread in network call of login */
-                if (user != null && exception == null) {
-                    _signInData.value = signInData.copy(authError = false)
-                    uiAuthState.value = UIState.Success(true)
-                    successCallback(true, null)
-                }
-                else {
-                    uiAuthState.value = UIState.Error(exception?.message)
-                    _signInData.value = signInData.copy(authError = true)
-                    successCallback(false, exception)
+            viewModelScope.launch {
+                // Switch to Main dispatcher to update the UI
+                withContext(Dispatchers.Main) {
+                    if (user != null && exception == null) {
+                        _signInData.value = signInData.copy(authError = false)
+                        uiAuthState.value = UIState.Success(true)
+                        successCallback(true, null)
+                    } else {
+                        uiAuthState.value = UIState.Error(exception?.message)
+                        _signInData.value = signInData.copy(authError = true)
+                        successCallback(false, exception)
+                    }
                 }
             }
         }

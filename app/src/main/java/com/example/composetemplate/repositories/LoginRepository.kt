@@ -2,7 +2,9 @@ package com.example.composetemplate.repositories
 
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.remote.base.BaseRequest
-import com.example.composetemplate.managers.NetworkManager
+import com.example.composetemplate.data.remote.requests.FirebaseUserRequests
+import com.example.composetemplate.managers.FirebaseNetworkManager
+import com.example.composetemplate.managers.MainNetworkManager
 import com.example.composetemplate.utils.LoginCallback
 import com.example.composetemplate.utils.SuccessCallback
 import com.example.composetemplate.utils.extensions.isSuccessful
@@ -23,7 +25,7 @@ interface AuthDbServiceable {
  */
 class LoginRepository(
     private val authDataSource: AuthDataSource,
-    private val networkManager: NetworkManager,
+    private val networkManager: FirebaseNetworkManager,
     private val ioScope: CoroutineScope,
 ): AuthDbServiceable {
 
@@ -98,9 +100,9 @@ class LoginRepository(
                 when (requestType) {
                     RequestType.CREATE_USER -> {
                         if (user == null) return null
-                        authDataSource.createOrUpdateUserRequest(user)
+                        FirebaseUserRequests.CreateOrUpdateUser(body = user)
                     }
-                    RequestType.GET_USER -> authDataSource.getUserRequest()
+                    RequestType.GET_USER -> FirebaseUserRequests.GetUser()
                 }
             }
         }
