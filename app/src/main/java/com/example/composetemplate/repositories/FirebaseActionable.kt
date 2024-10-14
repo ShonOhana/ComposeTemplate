@@ -16,7 +16,7 @@ import kotlin.coroutines.resume
  * from various sources, such as remote APIs, local databases, or in-memory caches.
  * allowing the repository to seamlessly aggregate and supply data to the ViewModel without worrying about the underlying data origins or access mechanisms.
  */
-class FirebaseDataSource : AuthDataSource, TokenFetcher {
+class FirebaseActionable : AuthActionable, TokenFetcher {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 

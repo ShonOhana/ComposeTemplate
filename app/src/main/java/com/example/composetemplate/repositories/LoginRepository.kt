@@ -3,7 +3,6 @@ package com.example.composetemplate.repositories
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.remote.base.BaseRequest
 import com.example.composetemplate.data.remote.requests.FirebaseUserRequests
-import com.example.composetemplate.managers.FirebaseNetworkManager
 import com.example.composetemplate.managers.MainNetworkManager
 import com.example.composetemplate.utils.LoginCallback
 import com.example.composetemplate.utils.SuccessCallback
@@ -24,8 +23,8 @@ interface AuthDbServiceable {
  * This class contain the functionality of all login auth types
  */
 class LoginRepository(
-    private val authDataSource: AuthDataSource,
-    private val networkManager: FirebaseNetworkManager,
+    private val authActionable: AuthActionable,
+    private val networkManager: MainNetworkManager,
     private val ioScope: CoroutineScope,
 ): AuthDbServiceable {
 
@@ -35,7 +34,7 @@ class LoginRepository(
 
     /** create user by email and password */
     fun registerUser(user: User, password: String, loginCallback: LoginCallback) {
-        authDataSource.createUserWithEmailAndPassword(user, password) { createdUser, exception ->
+        authActionable.createUserWithEmailAndPassword(user, password) { createdUser, exception ->
             if (createdUser != null && exception == null)
                 createOrUpdateUser(user, loginCallback)
             else {
@@ -47,7 +46,7 @@ class LoginRepository(
     /** sign in user by email and password */
     fun signInEmailPasswordUser(user: User, password: String, loginCallback: LoginCallback) {
         if (user.email.isEmpty().not()) {
-            authDataSource.signInWithEmailAndPassword(user, password) { createdUser, exception ->
+            authActionable.signInWithEmailAndPassword(user, password) { createdUser, exception ->
                 if (createdUser != null && exception == null)
                     createOrUpdateUser(user, loginCallback)
                 else {
@@ -58,15 +57,15 @@ class LoginRepository(
             loginCallback(null, Exception("email is empty"))
     }
 
-    fun logOut() = authDataSource.logout()
+    fun logOut() = authActionable.logout()
 
-    fun resetPassword(email: String, successCallback: SuccessCallback) = authDataSource.resetPassword(email,successCallback)
+    fun resetPassword(email: String, successCallback: SuccessCallback) = authActionable.resetPassword(email,successCallback)
 
     override fun getUser(loginCallback: LoginCallback) {
-        authDataSource.getUser { user, exception ->
+        authActionable.getUser { user, exception ->
             if (exception == null) {
                 ioScope.launch {
-                    val baseRequest = createBaseRequest(RequestType.GET_USER, authDataSource, user) ?: return@launch
+                    val baseRequest = createBaseRequest(RequestType.GET_USER, authActionable, user) ?: return@launch
                     val httpResponse = (networkManager.sendRequest(baseRequest) as? HttpResponse)
                     httpResponse?.let { response ->
                         val remoteUser = response.body<User>()
@@ -81,7 +80,7 @@ class LoginRepository(
 
     override fun createOrUpdateUser(user: User, loginCallback: LoginCallback) {
         ioScope.launch {
-            val baseRequest = createBaseRequest(RequestType.CREATE_USER, authDataSource, user) ?: return@launch
+            val baseRequest = createBaseRequest(RequestType.CREATE_USER, authActionable, user) ?: return@launch
             val httpResponse = (networkManager.sendRequest(baseRequest) as? HttpResponse)
             val success = httpResponse?.isSuccessful() == true
             if (success) loginCallback(user, null) else loginCallback(null, Exception())
@@ -92,11 +91,11 @@ class LoginRepository(
      * every class that implement AuthDataSource will demand here to fill the request */
     private fun createBaseRequest(
         requestType: RequestType,
-        authDataSource: AuthDataSource,
+        authActionable: AuthActionable,
         user: User?
     ): BaseRequest? {
-        val baseRequest = when (authDataSource) {
-            is FirebaseDataSource -> {
+        val baseRequest = when (authActionable) {
+            is FirebaseActionable -> {
                 when (requestType) {
                     RequestType.CREATE_USER -> {
                         if (user == null) return null

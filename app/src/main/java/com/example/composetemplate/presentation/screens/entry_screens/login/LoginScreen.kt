@@ -36,6 +36,7 @@ import com.example.composetemplate.R
 import com.example.composetemplate.presentation.common.BaseNativeDialog
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
+import com.example.composetemplate.presentation.dialogs.ForgotPasswordDialog
 import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
 import com.example.composetemplate.presentation.screens.entry_screens.register.registerFields
 import com.example.composetemplate.ui.theme.CustomTheme
@@ -99,7 +100,9 @@ fun LoginScreen(
                                 viewModel.onEvent(loginField, newValue, AuthScreenState.Login)
                             },
                             isLastEditText = index == loginFields.size - 1,
-                            onNextFocusRequest = if (index < focusRequestList.size -1) focusRequestList[index + 1] else focusRequestList[index]
+                            onNextFocusRequest =
+                            if (index < focusRequestList.size - 1) focusRequestList[index + 1]
+                            else focusRequestList[index]
                         )
                     }
                     Text(
@@ -148,75 +151,5 @@ fun LoginScreen(
         }
     }
     ForgotPasswordDialog(viewModel)
-}
-
-@Composable
-fun ForgotPasswordDialog(
-    viewModel: AuthViewModel
-) {
-    if (viewModel.isForgotDialogVisible) {
-        BaseNativeDialog(
-            modifier = Modifier,
-            onDismissRequest = { viewModel.setForgotDialogVisibility(false) }) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally // Center title
-            ) {
-                // Title in the middle
-                Text(
-                    text = FORGOT_PASSWORD_TITLE,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    textAlign = TextAlign.Center, // Center the text inside the Text composable
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                LoginTextField(
-                    modifier = Modifier,
-                    text = viewModel.setText(
-                        AuthTextFieldsEnum.FORGOT_PASSWORD,
-                        AuthScreenState.Login
-                    ),
-                    loginScreenEnum = AuthTextFieldsEnum.FORGOT_PASSWORD,
-                    isValid = viewModel.validateEditText(
-                        AuthTextFieldsEnum.FORGOT_PASSWORD,
-                        AuthScreenState.Login
-                    ),
-                    onValueChange = { newValue ->
-                        viewModel.onEvent(
-                            AuthTextFieldsEnum.FORGOT_PASSWORD,
-                            newValue,
-                            AuthScreenState.Login
-                        )
-                    },
-                    isLastEditText = true,
-                    leadingIcon = {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.email_icon),
-                            contentDescription = "Email Icon",
-                            tint = Color.White
-                        )
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Button below the TextField
-                LoginScreenButton(
-                    onClick = {
-                        viewModel.resetPassword(viewModel.forgotPasswordMail)
-                        viewModel.setForgotDialogVisibility(false)
-                    },
-                    isEnabled = true,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = FORGOT_PASSWORD_BUTTON_TEXT
-                )
-            }
-        }
-    }
 }
 

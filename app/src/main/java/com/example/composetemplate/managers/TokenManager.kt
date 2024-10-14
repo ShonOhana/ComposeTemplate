@@ -1,5 +1,8 @@
 package com.example.composetemplate.managers
 
+import com.example.composetemplate.utils.exceptions.FailedToFetchTokenException
+import com.example.composetemplate.utils.exceptions.UnavailableTokenException
+
 interface TokenFetcher {
     suspend fun fetchToken(): TokenData
 }
@@ -19,10 +22,10 @@ class TokenManager(private val tokenFetcher: TokenFetcher) {
             if (newToken != null) {
                 saveToken(newToken, newExpirationTime)
             } else {
-                throw Exception("Failed to fetch a valid token")
+                throw FailedToFetchTokenException()
             }
         }
-        return token ?: throw Exception("Token is unavailable")
+        return token ?: throw UnavailableTokenException()
     }
 
     private fun saveToken(newToken: String, newExpirationTime: Long?) {

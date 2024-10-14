@@ -3,7 +3,9 @@ package com.example.composetemplate
 import android.app.Application
 import com.example.composetemplate.di.appModule
 import com.example.composetemplate.di.coroutineModule
+import com.example.composetemplate.di.dataSourceModule
 import com.example.composetemplate.di.databaseModule
+import com.example.composetemplate.di.interactorsModule
 import com.example.composetemplate.di.managersModule
 import com.example.composetemplate.di.networkModule
 import com.example.composetemplate.di.repositoriesModule
@@ -27,7 +29,9 @@ class MainApplication : Application() {
                 repositoriesModule,
                 viewModelsModules,
                 managersModule,
-                databaseModule
+                databaseModule,
+                dataSourceModule,
+                interactorsModule,
             )
         }
     }

@@ -29,12 +29,22 @@ enum class AuthTextFieldsEnum {
     }
 
     fun getKeyboardOptions(isLastEditText: Boolean): KeyboardOptions {
-        return when(this) {
+        return when (this) {
             FORGOT_PASSWORD,
-            EMAIL -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
+            EMAIL -> KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            )
             CONFIRM_PASSWORD,
-            PASSWORD -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password, imeAction = if (isLastEditText) ImeAction.Done else ImeAction.Next)
-            FULL_NAME -> KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text,imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Words)
+            PASSWORD -> KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Password,
+                imeAction = if (isLastEditText) ImeAction.Done else ImeAction.Next
+            )
+            FULL_NAME -> KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next,
+                capitalization = KeyboardCapitalization.Words
+            )
         }
     }
 
