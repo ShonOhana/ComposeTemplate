@@ -7,8 +7,10 @@ import com.example.composetemplate.data.remote.base.BaseNetworking
 /**
  * This class is responsible for managing all network operations.
  * Here, we will execute network requests and perform related tasks.
+ *
+ * This class is our MainNetworkManager for all api calls.
  * */
-class NetworkManager(
+class MainNetworkManager(
     private val baseNetworking: BaseNetworking
 ) {
 
