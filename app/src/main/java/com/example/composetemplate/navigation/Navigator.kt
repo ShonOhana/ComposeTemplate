@@ -39,6 +39,7 @@ class Navigator {
                     popUpTo(navHostController.graph.startDestinationId){inclusive = true}
                 }
             }
+            AppScreen.Lectures,
             AppScreen.Home -> {
                 /* When the app navigates to the home screen we want to remove all the EntryGraph from the back stack */
                 navigateAndRemoveGraph<EntryGraph>(navigableScreen)

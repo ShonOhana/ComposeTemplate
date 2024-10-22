@@ -91,9 +91,9 @@ fun LoginTextField(
 
         )
     // Automatically request focus and show the keyboard
-    LaunchedEffect(Unit) {
-        focusRequester?.requestFocus()
-        keyboardController?.show()
-    }
+//    LaunchedEffect(Unit) {
+//        focusRequester?.requestFocus()
+//        keyboardController?.show()
+//    }
     Spacer(modifier = modifier.height(12.dp))
 }

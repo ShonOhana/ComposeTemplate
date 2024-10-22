@@ -40,7 +40,7 @@ fun SplashScreen(
          */
         authViewModel.getUser { user, exception ->
             if (user != null && exception == null)
-                navigator.navigate(MainScreens.Home)
+                navigator.navigate(MainScreens.Lectures)
             else
                 navigator.navigate(EntryScreens.Auth)
         }
