@@ -13,3 +13,9 @@ fun String.isValidFullName(): Boolean {
     val fullNameRegex = Regex("[a-zA-Z]+( [a-zA-Z]+)+")
     return fullNameRegex.matches(this)
 }
+
+fun String.toSnakeCase(): String {
+    return this.replace(Regex("([a-z])([A-Z])"), "$1_$2")
+        .replace(" ", "_")
+        .lowercase()
+}

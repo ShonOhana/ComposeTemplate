@@ -19,7 +19,7 @@ class LogsManager {
     }
 
     enum class LogTag {
-        SERVER,GENERAL,DATA_STORE
+        SERVER,GENERAL,DATA_STORE,CONFIG
     }
 
     fun logBundle(type: LogType, tag: LogTag, bundle: Bundle, function: String? = null) {

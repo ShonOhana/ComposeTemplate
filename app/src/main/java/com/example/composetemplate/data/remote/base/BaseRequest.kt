@@ -11,4 +11,5 @@ interface BaseRequest {
     val headers: MutableMap<String, String>?
     val body: Any?
     val timeout:Long?
+    val addToken:Boolean
 }

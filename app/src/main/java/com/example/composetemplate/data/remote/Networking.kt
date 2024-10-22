@@ -2,8 +2,8 @@ package com.example.composetemplate.data.remote
 
 import android.content.Context
 import com.example.composetemplate.data.remote.base.BaseNetworking
+import com.example.composetemplate.data.remote.confing.FirebaseConfigProvider
 import com.example.composetemplate.managers.ConnectivityManager
-import com.example.composetemplate.utils.Constants
 import com.example.composetemplate.utils.LogsManager
 import com.example.composetemplate.utils.exceptions.NoInternetConnectionException
 import com.example.composetemplate.utils.exceptions.UnauthorizedException
@@ -13,8 +13,8 @@ In our project, we anticipate the existence of multiple networking classes tailo
 Each networking class is expected to inherit from BaseNetworking and implement the ServerAuthenticator interface */
 
 class Networking(private val application: Context) : BaseNetworking(), ServerAuthenticator {
-
-    override val baseUrl: String = Constants.BASE_URL
+    
+    override val baseUrl: String = FirebaseConfigProvider.getData(FirebaseConfigProvider.RemoteConfigValues.BASE_URL)
 
     /** This function intercept the request if there is no internet connection,
      * or the user is unauthorized.

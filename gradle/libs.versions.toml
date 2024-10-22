@@ -2,12 +2,12 @@
 agp = "8.4.2"
 androidxJunit = "1.2.1"
 coilCompose = "2.5.0"
-composeBomVersion = "2024.09.02"
+composeBomVersion = "2024.09.03"
 coreKtxVersion = "1.13.1"
 datastorePreferences = "1.1.1"
 espressoCoreVersion = "3.6.1"
-firebaseBom = "33.3.0"
-foundation = "1.7.2"
+firebaseBom = "33.4.0"
+foundation = "1.7.3"
 gson = "2.10.1"
 koinAndroidVersion = "3.5.0"
 kotlin = "2.0.0"
@@ -18,7 +18,8 @@ lifecycleRuntimeKtxVersion = "2.8.6"
 pagingRuntimeKtx = "3.3.2"
 roomVersion = "2.6.1"
 serialization = "1.6.3"
-composeNavigation = "2.8.1"
+composeNavigation = "2.8.2"
+firebaseConfigKtx = "22.0.0"
 
 [libraries]
 androidx-compose-bom-v20240600 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -38,6 +39,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -57,6 +59,7 @@ ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
+firebase-config-ktx = { group = "com.google.firebase", name = "firebase-config-ktx", version.ref = "firebaseConfigKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
