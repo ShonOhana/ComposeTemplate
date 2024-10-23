@@ -11,6 +11,9 @@ import java.util.Locale
  * This class provides an easy way to retrieve various types of configuration values from Firebase Remote Config.
  * It uses an enum [RemoteConfigValues] to define keys, and the [getData] function to fetch values in a type-safe manner.
  */
+
+typealias remoteConfigVal = FirebaseConfigProvider.RemoteConfigValues
+
 object FirebaseConfigProvider {
 
     /**

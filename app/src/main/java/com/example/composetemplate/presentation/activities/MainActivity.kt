@@ -12,11 +12,8 @@ import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
 
-    private val firebaseConfigurationManager: FirebaseConfigurationManager by inject()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        firebaseConfigurationManager.initConfiguration()
         enableEdgeToEdge()
         setContent {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
