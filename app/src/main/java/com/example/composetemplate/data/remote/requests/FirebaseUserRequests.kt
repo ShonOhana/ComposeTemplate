@@ -1,7 +1,8 @@
 package com.example.composetemplate.data.remote.requests
 
 import com.example.composetemplate.data.remote.base.BaseRequest
-import com.example.composetemplate.utils.Constants
+import com.example.composetemplate.data.remote.confing.FirebaseConfigProvider
+import com.example.composetemplate.data.remote.confing.remoteConfigVal
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import io.ktor.http.HttpMethod
@@ -14,7 +15,8 @@ sealed class FirebaseUserRequests {
         override val headers: MutableMap<String, String>? = null,
         override val body: Any?,
         override val timeout: Long? = null,
-        override val baseUrl: String = Constants.FIREBASE_BASE_URL,
+        override val baseUrl: String = FirebaseConfigProvider.getData(remoteConfigVal.BASE_FIREBASE_URL),
+        override val addToken: Boolean = true
     ) : BaseRequest
 
     class GetUser(
@@ -24,7 +26,8 @@ sealed class FirebaseUserRequests {
         override val headers: MutableMap<String, String>? = null,
         override val body: Any? = null,
         override val timeout: Long? = null,
-        override val baseUrl: String = Constants.FIREBASE_BASE_URL,
+        override val baseUrl: String =  FirebaseConfigProvider.getData(remoteConfigVal.BASE_FIREBASE_URL),
+        override val addToken: Boolean = true
     ) : BaseRequest
 
 }

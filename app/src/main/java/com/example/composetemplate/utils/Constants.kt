@@ -17,8 +17,6 @@ class Constants {
         const val ONE_HOUR = ONE_MINUTE * 60
 
         // Network
-        const val BASE_URL = "newsapi.org"
-        const val FIREBASE_BASE_URL = "compose-template-c8fe9-default-rtdb.firebaseio.com"
         const val GET_SOURCES_PATH = "v2/sources"
         const val TIME_OUT = 30 * ONE_SECOND
 
@@ -60,5 +58,11 @@ class Constants {
         const val FORGOT_PASSWORD_TEXT = "Enter your email"
         const val FORGOT_PASSWORD_TITLE = "Forgot Password"
         const val FORGOT_PASSWORD_BUTTON_TEXT = "Send email"
+
+        //Logs Messages
+        const val CONFIG_FETCHED_SUCCESSFULLY = "config params fetched successfully, is updated:"
+        const val CONFIG_FETCHED_FAILED = "Config fetch failed"
+        const val CONFIG_UPDATED_SUCCESSFULLY = "Updated keys:"
+        const val CONFIG_UPDATED_FAILED = "Config update error with code:"
     }
 }
