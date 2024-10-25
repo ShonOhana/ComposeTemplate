@@ -10,11 +10,15 @@ import com.example.composetemplate.di.managersModule
 import com.example.composetemplate.di.networkModule
 import com.example.composetemplate.di.repositoriesModule
 import com.example.composetemplate.di.viewModelsModules
+import com.example.composetemplate.managers.FirebaseConfigurationManager
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
 class MainApplication : Application() {
+
+    private val firebaseConfigurationManager: FirebaseConfigurationManager by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -34,6 +38,8 @@ class MainApplication : Application() {
                 interactorsModule,
             )
         }
+
+        firebaseConfigurationManager.initConfiguration()
     }
 
 }

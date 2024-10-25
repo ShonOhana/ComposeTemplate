@@ -2,8 +2,9 @@ package com.example.composetemplate.data.remote
 
 import android.content.Context
 import com.example.composetemplate.data.remote.base.BaseNetworking
+import com.example.composetemplate.data.remote.confing.FirebaseConfigProvider
+import com.example.composetemplate.data.remote.confing.remoteConfigVal
 import com.example.composetemplate.managers.ConnectivityManager
-import com.example.composetemplate.utils.Constants
 import com.example.composetemplate.utils.LogsManager
 import com.example.composetemplate.utils.exceptions.NoInternetConnectionException
 import com.example.composetemplate.utils.exceptions.UnauthorizedException
@@ -14,7 +15,7 @@ Each networking class is expected to inherit from BaseNetworking and implement t
 
 class Networking(private val application: Context) : BaseNetworking(), ServerAuthenticator {
 
-    override val baseUrl: String = Constants.BASE_URL
+    override val baseUrl: String = FirebaseConfigProvider.getData(remoteConfigVal.BASE_URL)
 
     /** This function intercept the request if there is no internet connection,
      * or the user is unauthorized.

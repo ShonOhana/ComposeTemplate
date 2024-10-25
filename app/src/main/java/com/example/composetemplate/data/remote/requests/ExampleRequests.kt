@@ -1,6 +1,8 @@
 package com.example.composetemplate.data.remote.requests
 
 import com.example.composetemplate.data.remote.base.BaseRequest
+import com.example.composetemplate.data.remote.confing.FirebaseConfigProvider
+import com.example.composetemplate.data.remote.confing.remoteConfigVal
 import com.example.composetemplate.utils.Constants
 import io.ktor.http.HttpMethod
 
@@ -19,7 +21,8 @@ sealed class ExampleRequests {
         override val headers: MutableMap<String, String>? = null,
         override val body: Any? = null,
         override val timeout: Long? = null,
-        override val baseUrl: String = Constants.BASE_URL
+        override val baseUrl: String = FirebaseConfigProvider.getData(remoteConfigVal.BASE_URL),
+        override val addToken: Boolean = false
     ) : BaseRequest
 
 }

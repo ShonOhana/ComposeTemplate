@@ -19,8 +19,13 @@ import org.koin.java.KoinJavaComponent.inject
  * so i Add it automatically to every call. if we dont need it we can edit with if condition or
  * move the get token fun to our @FirebaseNetwotkManager or create new class called @FirebaseAuthNetwotkManager*/
 suspend fun HttpRequestBuilder.buildRequest(request: BaseRequest) {
-    val tokenManager by inject<TokenManager>(TokenManager::class.java)
-    val token = tokenManager.getToken()
+    val token = if (request.addToken) {
+        val tokenManager by inject<TokenManager>(TokenManager::class.java)
+        tokenManager.getToken()
+    }else{
+        null
+    }
+
     url {
         method = request.method
         protocol = URLProtocol.HTTPS
@@ -32,7 +37,9 @@ suspend fun HttpRequestBuilder.buildRequest(request: BaseRequest) {
             for (entry in it) {
                 parameters.append(entry.key, entry.value)
             }
-            parameters.append("auth",token) // add firebase token to each call
+            token?.let {
+                parameters.append("auth", token)
+            }
         }
     }
     timeout { requestTimeoutMillis = request.timeout?: Constants.TIME_OUT }

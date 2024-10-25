@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<defaults>
+  <entry>
+    <key>base_firebase_url</key>
+    <value>compose-template-c8fe9-default-rtdb.firebaseio.com</value>
+  </entry>
+  <entry>
+    <key>base_url</key>
+    <value>newsapi.org</value>
+  </entry>
+</defaults>

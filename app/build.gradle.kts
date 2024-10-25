@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.firebase.config.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit.v121)
     androidTestImplementation(libs.androidx.espresso.core.v361)
@@ -77,6 +78,7 @@ dependencies {
 
     /* Firebase */
     implementation(platform(libs.firebase.bom))
+    implementation(platform(libs.firebase.analytics))
     implementation(libs.firebase.auth)
 
     /* Gson */
