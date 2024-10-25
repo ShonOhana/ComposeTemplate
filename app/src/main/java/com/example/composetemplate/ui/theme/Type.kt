@@ -78,7 +78,7 @@ data class CustomTypography(
 
     @Composable
     fun getPastLectureTitleStyle(): TextStyle {
-        return MaterialTheme.typography.displaySmall.copy(
+        return MaterialTheme.typography.titleLarge.copy(
             fontWeight = FontWeight.ExtraBold,
             color = CustomTheme.colors.text,
         )

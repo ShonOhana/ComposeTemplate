@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.firebase.config.ktx)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit.v121)
     androidTestImplementation(libs.androidx.espresso.core.v361)
@@ -119,4 +120,6 @@ dependencies {
 
     /* DataStore */
     implementation(libs.androidx.datastore.preferences.core)
+
+    implementation(libs.androidx.constraintlayout.compose)
 }

@@ -2,7 +2,6 @@ package com.example.composetemplate.presentation.screens.main_screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -34,11 +31,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.composetemplate.R
-import com.example.composetemplate.navigation.Navigator
 import com.example.composetemplate.ui.theme.CustomTheme
+import com.example.composetemplate.ui.theme.CustomTheme.colors
 
 // TODO: put that in top bar and then change background
 // TODO: check time format
@@ -69,39 +66,54 @@ fun LectureScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
+                        // Using ConstraintLayout to center the title
+                        ConstraintLayout(
+                            modifier = Modifier.fillMaxWidth()
                         ) {
+                            val (titleRef, iconRightRef) = createRefs()
+
                             Text(
-                                text = "OnO Lectures",
+                                text = "Ono Lectures",
                                 style = CustomTheme.typography.getLecturesTopBarTitleStyle(),
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.constrainAs(titleRef) {
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                }
                             )
+
+                            // Right Icons
+                            Row(
+                                modifier = Modifier.constrainAs(iconRightRef) {
+                                    end.linkTo(parent.end)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                }.padding(end = 18.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // First Icon
+                                IconButton(modifier = modifier.size(36.dp), onClick = { /* Handle first icon click */ }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.add_circle), // Replace with your first icon
+                                        contentDescription = "First Icon",
+                                        tint = colors.loginEnable
+                                    )
+                                }
+                                // Second Icon
+                                IconButton(modifier = modifier.size(36.dp),onClick = { /* Handle second icon click */ }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.settings), // Replace with your second icon
+                                        contentDescription = "Second Icon",
+                                        tint = colors.loginEnable
+                                    )
+                                }
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = CustomTheme.colors.loginScreen
+                        containerColor = colors.loginScreen
                     ),
-                    actions = {
-                        // Add two icons to the end of the TopAppBar
-                        IconButton(onClick = { /* Handle first icon click */ }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.email_icon), // Replace with your first icon
-                                contentDescription = "First Icon",
-                                tint = Color.White // Set color for the first icon
-                            )
-                        }
-                        IconButton(onClick = { /* Handle second icon click */ }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.google_login_icon), // Replace with your second icon
-                                contentDescription = "Second Icon",
-                                tint = Color.White // Set color for the second icon
-                            )
-                        }
-                    }
                 )
             },
             content = { paddingValues ->
@@ -109,7 +121,7 @@ fun LectureScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(CustomTheme.colors.loginScreen)
+                        .background(colors.loginScreen)
                         .padding(paddingValues)
                 ) {
                     LazyColumn(
@@ -130,7 +142,7 @@ fun LectureScreen(
                             item {
                                 Text(
                                     text = "Past Lectures",
-                                    modifier = Modifier.padding(vertical = 8.dp),
+                                    modifier = Modifier.padding(start = 8.dp, top = 8.dp),
                                     style = CustomTheme.typography.getPastLectureTitleStyle(),
                                 )
                             }

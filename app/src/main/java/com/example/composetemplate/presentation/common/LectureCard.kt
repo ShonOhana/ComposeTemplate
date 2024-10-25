@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import com.example.composetemplate.R
 import com.example.composetemplate.data.models.server_models.Lecture
 import com.example.composetemplate.ui.theme.CustomTheme
+import com.example.composetemplate.utils.Constants.Companion.LECTURE_CARD_PAST_TIME
+import com.example.composetemplate.utils.DateUtil
 
 @Composable
 fun LectureCard(
@@ -120,7 +122,7 @@ fun LectureCard(
             Spacer(modifier = modifier.height(6.dp))
 
             Text(
-                text = lecture.timeStamp,
+                text = if (lecture.isPast) LECTURE_CARD_PAST_TIME else DateUtil.lectureFormatDate(lecture.timeStamp),
                 style = CustomTheme.typography.getLectureTimeStampStyle(lecture.isPast),
                 modifier = Modifier.padding(start = 8.dp)
             )

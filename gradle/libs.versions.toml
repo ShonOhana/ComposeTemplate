@@ -20,9 +20,11 @@ roomVersion = "2.6.1"
 serialization = "1.6.3"
 composeNavigation = "2.8.2"
 firebaseConfigKtx = "22.0.0"
+constraintlayout = "2.1.4"
 
 [libraries]
 androidx-compose-bom-v20240600 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version = "1.0.1" }
 androidx-core-ktx-v1130 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferences" }
@@ -60,6 +62,7 @@ ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 firebase-config-ktx = { group = "com.google.firebase", name = "firebase-config-ktx", version.ref = "firebaseConfigKtx" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
