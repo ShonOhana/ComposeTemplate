@@ -27,6 +27,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -34,29 +36,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.composetemplate.R
+import com.example.composetemplate.presentation.screens.main_screens.viewmodels.LecturesViewModel
 import com.example.composetemplate.ui.theme.CustomTheme
 import com.example.composetemplate.ui.theme.CustomTheme.colors
-
-// TODO: put that in top bar and then change background
-// TODO: check time format
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LectureScreen(
     modifier: Modifier = Modifier,
-    layoutDirection: LayoutDirection = LayoutDirection.Ltr
-//    lectures: List<Lecture> //TODO: replace to viewModel to fetch the lectures
+    layoutDirection: LayoutDirection = LayoutDirection.Ltr,
+    viewModel: LecturesViewModel = koinViewModel()
 ) {
     CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
-        // Sample data, replace with ViewModel
-        val lectures = listOf(
-            Lecture("Ktor", "Shon Ohana", "2025-10-21T07:43:59.183Z"),
-            Lecture("Koin", "Raz Cohen", "2026-10-21T07:43:59.183Z"),
-            Lecture("Swift", "Tom Zion", "2027-10-21T07:43:59.183Z"),
-            Lecture("Compose", "Idan Edri", "2024-10-21T07:43:59.183Z"),
-            Lecture("Niggling", "Noam Haba", "2024-10-21T07:43:59.183Z"),
-            Lecture("Russian", "Alex something", "2024-10-21T07:43:59.183Z")
-        )
+        val lectures by viewModel.lectures.collectAsState()
 
         // Separate the lectures into past and upcoming based on the date
         val pastLectures = lectures.filter { it.isPast }
@@ -75,7 +68,7 @@ fun LectureScreen(
                             Text(
                                 text = "Ono Lectures",
                                 style = CustomTheme.typography.getLecturesTopBarTitleStyle(),
-                                modifier = Modifier.constrainAs(titleRef) {
+                                modifier = modifier.constrainAs(titleRef) {
                                     start.linkTo(parent.start)
                                     end.linkTo(parent.end)
                                     top.linkTo(parent.top)
@@ -85,29 +78,16 @@ fun LectureScreen(
 
                             // Right Icons
                             Row(
-                                modifier = Modifier.constrainAs(iconRightRef) {
-                                    end.linkTo(parent.end)
-                                    top.linkTo(parent.top)
-                                    bottom.linkTo(parent.bottom)
-                                }.padding(end = 18.dp),
+                                modifier = modifier
+                                    .constrainAs(iconRightRef) {
+                                        end.linkTo(parent.end)
+                                        top.linkTo(parent.top)
+                                        bottom.linkTo(parent.bottom)
+                                    }
+                                    .padding(end = 18.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // First Icon
-                                IconButton(modifier = modifier.size(36.dp), onClick = { /* Handle first icon click */ }) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.add_circle), // Replace with your first icon
-                                        contentDescription = "First Icon",
-                                        tint = colors.loginEnable
-                                    )
-                                }
-                                // Second Icon
-                                IconButton(modifier = modifier.size(36.dp),onClick = { /* Handle second icon click */ }) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.settings), // Replace with your second icon
-                                        contentDescription = "Second Icon",
-                                        tint = colors.loginEnable
-                                    )
-                                }
+                                TopBarEndIcons(modifier)
                             }
                         }
                     },
@@ -129,16 +109,15 @@ fun LectureScreen(
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        // Upcoming lectures section
+                        /* Upcoming lectures section */
                         itemsIndexed(upcomingLectures) { index, lecture ->
                             LectureCard(lecture = lecture, isExpanded = index == 0)
                             if (index == 0)
                                 Spacer(modifier = modifier.height(30.dp))
                         }
 
-                        // If there are past lectures, show a "Past Lectures" title and list them
+                        /* Add a title for the past lectures section */
                         if (pastLectures.isNotEmpty()) {
-                            // Add a title for the past lectures section
                             item {
                                 Text(
                                     text = "Past Lectures",
@@ -146,8 +125,7 @@ fun LectureScreen(
                                     style = CustomTheme.typography.getPastLectureTitleStyle(),
                                 )
                             }
-
-                            // Past lectures section
+                            /* Past lectures section */
                             items(pastLectures) { lecture ->
                                 LectureCard(lecture = lecture)
                             }
@@ -155,6 +133,25 @@ fun LectureScreen(
                     }
                 }
             }
+        )
+    }
+}
+
+@Composable
+private fun TopBarEndIcons(modifier: Modifier) {
+    IconButton(modifier = modifier.size(36.dp), onClick = { /* Handle first icon click */ }) {
+        Icon(
+            painter = painterResource(id = R.drawable.add_circle), // Replace with your first icon
+            contentDescription = "First Icon",
+            tint = colors.loginEnable
+        )
+    }
+    // Second Icon
+    IconButton(modifier = modifier.size(36.dp), onClick = { /* Handle second icon click */ }) {
+        Icon(
+            painter = painterResource(id = R.drawable.settings), // Replace with your second icon
+            contentDescription = "Second Icon",
+            tint = colors.loginEnable
         )
     }
 }

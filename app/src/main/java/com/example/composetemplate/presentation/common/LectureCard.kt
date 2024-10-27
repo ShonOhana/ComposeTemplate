@@ -28,7 +28,8 @@ import androidx.compose.ui.unit.dp
 import com.example.composetemplate.R
 import com.example.composetemplate.data.models.server_models.Lecture
 import com.example.composetemplate.ui.theme.CustomTheme
-import com.example.composetemplate.utils.Constants.Companion.LECTURE_CARD_PAST_TIME
+import com.example.composetemplate.utils.Constants.Companion.LECTURE_CARD_NEXT_LECTURE_TEXT
+import com.example.composetemplate.utils.Constants.Companion.LECTURE_CARD_PAST_TIME_TEXT
 import com.example.composetemplate.utils.DateUtil
 
 @Composable
@@ -54,7 +55,7 @@ fun LectureCard(
         ) {
             if (isExpanded) {
                 Text(
-                    text = "Next Lecture",
+                    text = LECTURE_CARD_NEXT_LECTURE_TEXT,
                     color = CustomTheme.colors.text,
                     style = CustomTheme.typography.getLectureTopicStyle(),
                     modifier = Modifier.padding(start = 8.dp)
@@ -78,7 +79,7 @@ fun LectureCard(
                     )
 
                     Text(
-                        text = lecture.author,
+                        text = lecture.developerName,
                         style = CustomTheme.typography.getLectureAuthorStyle(),
                         modifier = Modifier.padding(start = 16.dp)
                     )
@@ -102,7 +103,7 @@ fun LectureCard(
                     )
 
                     Text(
-                        text = lecture.author,
+                        text = lecture.developerName,
                         color = CustomTheme.colors.text,
                         style = CustomTheme.typography.getLectureAuthorStyle(),
                         modifier = Modifier.padding(top = 12.dp)
@@ -113,7 +114,7 @@ fun LectureCard(
             Spacer(modifier = modifier.height(10.dp))
 
             Text(
-                text = lecture.title,
+                text = lecture.topic,
                 color = CustomTheme.colors.text,
                 style = CustomTheme.typography.getLectureTopicStyle(),
                 modifier = Modifier.padding(start = 8.dp)
@@ -122,7 +123,7 @@ fun LectureCard(
             Spacer(modifier = modifier.height(6.dp))
 
             Text(
-                text = if (lecture.isPast) LECTURE_CARD_PAST_TIME else DateUtil.lectureFormatDate(lecture.timeStamp),
+                text = if (lecture.isPast) LECTURE_CARD_PAST_TIME_TEXT else DateUtil.lectureFormatDate(lecture.dueDate),
                 style = CustomTheme.typography.getLectureTimeStampStyle(lecture.isPast),
                 modifier = Modifier.padding(start = 8.dp)
             )
@@ -130,12 +131,14 @@ fun LectureCard(
     }
 }
 
+/* This is preview to see the Ui of the LectureCard */
 @Preview(showBackground = true)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun LectureCardPrev() {
     LectureCard(
         lecture = Lecture(
+            "idddddddd",
             "Ktor",
             "User name",
             "2024-10-21T07:43:59.183Z"

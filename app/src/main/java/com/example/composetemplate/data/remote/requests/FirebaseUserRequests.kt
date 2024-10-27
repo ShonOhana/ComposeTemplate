@@ -30,4 +30,15 @@ sealed class FirebaseUserRequests {
         override val addToken: Boolean = true
     ) : BaseRequest
 
+    class GetLectures(
+        override val method: HttpMethod = HttpMethod.Get,
+        override val path: String? = "lectures.json",
+        override val queries: MutableMap<String, String>? = null,
+        override val headers: MutableMap<String, String>? = null,
+        override val body: Any? = null,
+        override val timeout: Long? = null,
+        override val baseUrl: String =  FirebaseConfigProvider.getData(remoteConfigVal.BASE_FIREBASE_URL),
+        override val addToken: Boolean = true
+    ) : BaseRequest
+
 }
