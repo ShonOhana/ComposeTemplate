@@ -52,26 +52,22 @@ fun AuthScreen(
                 viewModel = authViewModel,
                 onRegisterClicked = {
                     currentScreen = AuthScreenState.Register
-                    authViewModel.errorManager.clearErrorMessage()
                 },
                 isLoginSucceed = { success, exception ->
                     if (success && exception == null)
                         navigator.navigate(MainScreens.Home)
                 },
-                errorManager = authViewModel.errorManager
             )
 
             AuthScreenState.Register -> RegisterScreen(
                 viewModel = authViewModel,
                 onLoginClicked = {
                     currentScreen = AuthScreenState.Login
-                    authViewModel.errorManager.clearErrorMessage()
                 },
                 isRegisterSucceed = { success, exception ->
                     if (success && exception == null)
                         navigator.navigate(MainScreens.Home)
                 },
-                errorManager = authViewModel.errorManager
             )
         }
     }

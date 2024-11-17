@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.composetemplate.managers.ErrorManager
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
@@ -38,6 +37,7 @@ import com.example.composetemplate.utils.Constants.Companion.LOGIN_TEXT
 import com.example.composetemplate.utils.Constants.Companion.UNKNOWN_EXCEPTION
 import com.example.composetemplate.utils.SuccessCallback
 import kotlinx.coroutines.launch
+import java.util.logging.ErrorManager
 
 val registerFields = listOf(
     AuthTextFieldsEnum.FULL_NAME,
@@ -52,9 +52,8 @@ fun RegisterScreen(
     viewModel: AuthViewModel,
     onLoginClicked: () -> Unit,
     isRegisterSucceed: SuccessCallback,
-    errorManager: ErrorManager
 ) {
-    val errorMessage by errorManager.errorMessages.collectAsState()
+    val errorMessage = viewModel.signupData.authError
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val focusRequestList = remember {

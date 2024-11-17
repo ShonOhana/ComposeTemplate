@@ -36,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.composetemplate.R
-import com.example.composetemplate.managers.ErrorManager
 import com.example.composetemplate.presentation.common.BaseNativeDialog
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
@@ -52,6 +51,7 @@ import com.example.composetemplate.utils.Constants.Companion.UNKNOWN_EXCEPTION
 import com.example.composetemplate.utils.SuccessCallback
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import java.util.logging.ErrorManager
 
 val loginFields = listOf(
     AuthTextFieldsEnum.EMAIL,
@@ -64,9 +64,8 @@ fun LoginScreen(
     viewModel: AuthViewModel,
     onRegisterClicked: () -> Unit,
     isLoginSucceed: SuccessCallback,
-    errorManager: ErrorManager
 ) {
-    val errorMessage by errorManager.errorMessages.collectAsState()
+    val errorMessage = viewModel.signInData.authError
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
 

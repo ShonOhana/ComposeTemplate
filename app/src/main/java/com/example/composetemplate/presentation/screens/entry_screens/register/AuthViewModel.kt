@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
-import com.example.composetemplate.managers.ErrorManager
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.CONFIRM_PASSWORD
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.EMAIL
@@ -23,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.logging.ErrorManager
 
 /**
  * NOTE: In this class we use Firebase auth that work with old callback and does not support coroutines.
@@ -32,11 +32,10 @@ import kotlinx.coroutines.withContext
  * */
 class AuthViewModel(
     private val authInteractor: AuthInteractor,
-    val errorManager: ErrorManager
 ) : ViewModel() {
 
     // set the uiState of the auth page
-    private val uiAuthState = MutableStateFlow<UIState<Boolean>?>(null)
+    val uiAuthState = MutableStateFlow<UIState<Boolean>?>(null)
 
     //progress visibility according to uiState
     private val _isProgressVisible = mutableStateOf(false)
@@ -66,7 +65,6 @@ class AuthViewModel(
                 if (state != null) {
                     when (state) {
                         is UIState.Error -> {
-                            errorManager.setErrorMessage(state.message)
                             _isProgressVisible.value = false
                         }
 
@@ -75,7 +73,6 @@ class AuthViewModel(
                         }
 
                         is UIState.Success -> {
-                            errorManager.clearErrorMessage()
                             _isProgressVisible.value = false
                         }
                     }
@@ -98,9 +95,11 @@ class AuthViewModel(
                     // Switch to Main dispatcher to update the UI
                     withContext(Dispatchers.Main) {
                         if (user != null && exception == null) {
+                            _signupData.value = signupData.copy(authError = null)
                             uiAuthState.value = UIState.Success(true)
                             successCallback(true, null)
                         } else {
+                            _signupData.value = signupData.copy(authError = exception?.message)
                             uiAuthState.value = UIState.Error(exception?.message)
                             successCallback(false, exception)
                         }
@@ -137,9 +136,11 @@ class AuthViewModel(
                 // Switch to Main dispatcher to update the UI
                 withContext(Dispatchers.Main) {
                     if (user != null && exception == null) {
+                        _signInData.value = signInData.copy(authError = null)
                         uiAuthState.value = UIState.Success(true)
                         successCallback(true, null)
                     } else {
+                        _signInData.value = signInData.copy(authError = exception?.message)
                         uiAuthState.value = UIState.Error(exception?.message)
                         successCallback(false, exception)
                     }
