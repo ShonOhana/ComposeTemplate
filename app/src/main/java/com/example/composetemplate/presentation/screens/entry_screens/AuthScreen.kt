@@ -50,20 +50,24 @@ fun AuthScreen(
         when (currentScreen) {
             AuthScreenState.Login -> LoginScreen(
                 viewModel = authViewModel,
-                onRegisterClicked = { currentScreen = AuthScreenState.Register },
+                onRegisterClicked = {
+                    currentScreen = AuthScreenState.Register
+                },
                 isLoginSucceed = { success, exception ->
                     if (success && exception == null)
                         navigator.navigate(MainScreens.Home)
-                }
+                },
             )
 
             AuthScreenState.Register -> RegisterScreen(
                 viewModel = authViewModel,
-                onLoginClicked = { currentScreen = AuthScreenState.Login },
+                onLoginClicked = {
+                    currentScreen = AuthScreenState.Login
+                },
                 isRegisterSucceed = { success, exception ->
                     if (success && exception == null)
                         navigator.navigate(MainScreens.Home)
-                }
+                },
             )
         }
     }

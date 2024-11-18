@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.logging.ErrorManager
 
 /**
  * NOTE: In this class we use Firebase auth that work with old callback and does not support coroutines.
@@ -30,11 +31,11 @@ import kotlinx.coroutines.withContext
  * not support coroutines
  * */
 class AuthViewModel(
-    private val authInteractor: AuthInteractor
+    private val authInteractor: AuthInteractor,
 ) : ViewModel() {
 
     // set the uiState of the auth page
-    private val uiAuthState = MutableStateFlow<UIState<Boolean>?>(null)
+    val uiAuthState = MutableStateFlow<UIState<Boolean>?>(null)
 
     //progress visibility according to uiState
     private val _isProgressVisible = mutableStateOf(false)
@@ -94,12 +95,12 @@ class AuthViewModel(
                     // Switch to Main dispatcher to update the UI
                     withContext(Dispatchers.Main) {
                         if (user != null && exception == null) {
-                            _signupData.value = signupData.copy(authError = false)
+                            _signupData.value = signupData.copy(authError = null)
                             uiAuthState.value = UIState.Success(true)
                             successCallback(true, null)
                         } else {
+                            _signupData.value = signupData.copy(authError = exception?.message)
                             uiAuthState.value = UIState.Error(exception?.message)
-                            _signupData.value = signupData.copy(authError = true)
                             successCallback(false, exception)
                         }
                     }
@@ -135,12 +136,12 @@ class AuthViewModel(
                 // Switch to Main dispatcher to update the UI
                 withContext(Dispatchers.Main) {
                     if (user != null && exception == null) {
-                        _signInData.value = signInData.copy(authError = false)
+                        _signInData.value = signInData.copy(authError = null)
                         uiAuthState.value = UIState.Success(true)
                         successCallback(true, null)
                     } else {
+                        _signInData.value = signInData.copy(authError = exception?.message)
                         uiAuthState.value = UIState.Error(exception?.message)
-                        _signInData.value = signInData.copy(authError = true)
                         successCallback(false, exception)
                     }
                 }
