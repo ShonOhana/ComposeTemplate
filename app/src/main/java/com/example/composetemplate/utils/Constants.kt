@@ -30,6 +30,7 @@ class Constants {
         const val INTERNAL_SERVER_ERROR_EXCEPTION = "An internal server error occurred while processing your request."
         const val SERVICE_UNAVAILABLE_EXCEPTION = "The service is temporarily unavailable due to high load or maintenance."
         const val TIME_OUT_EXCEPTION = "The server did not respond within the expected time. Please check your internet connection and try again."
+        const val NO_DATA_EXCEPTION = "There are no data available."
 
         // Database
         const val NO_IMPLEMENT_DB_OPERATION_EXCEPTION = "You haven't implement database operation. Please notice to implement in your Dao. "
@@ -60,6 +61,16 @@ class Constants {
         const val FORGOT_PASSWORD_BUTTON_TEXT = "Send email"
         const val LECTURE_CARD_PAST_TIME_TEXT = "This lecture as past"
         const val LECTURE_CARD_NEXT_LECTURE_TEXT = "Next Lecture"
+
+        //EMPTY STATE
+        const val EMPTY_STATE_ACCESS_DENIED_TITLE = "Access Denied"
+        const val EMPTY_STATE_ACCESS_DENIED_SYNOPSIS = "looks like there are no valid token"
+        const val EMPTY_STATE_NO_LECTURE_TITLE = "No lectures"
+        const val EMPTY_STATE_NO_LECTURE_SYNOPSIS = "looks like there are no lectures scheduled"
+        const val EMPTY_STATE_GENERAL_BUG_TITLE = "General bug"
+        const val EMPTY_STATE_GENERAL_BUG_SYNOPSIS = "looks like there are something wrong with the server"
+        const val EMPTY_STATE_NO_INTERNET_TITLE = "No Internet"
+        const val EMPTY_STATE_NO_INTERNET_SYNOPSIS = "looks like there is no internet connected"
 
         //Logs Messages
         const val CONFIG_FETCHED_SUCCESSFULLY = "config params fetched successfully, is updated:"

@@ -65,7 +65,9 @@ data class CustomTypography(
 
     @Composable
     fun getLectureTopicStyle(): TextStyle {
-        return MaterialTheme.typography.titleMedium
+        return MaterialTheme.typography.titleMedium.copy(
+            color = CustomTheme.colors.text
+        )
     }
 
     @Composable
@@ -88,6 +90,30 @@ data class CustomTypography(
     fun getLecturesTopBarTitleStyle(): TextStyle {
         return MaterialTheme.typography.titleMedium.copy(
             color = CustomTheme.colors.loginEnable,
+        )
+    }
+
+    @Composable
+    fun getLecturesEmptyStateTitleStyle(): TextStyle {
+        return MaterialTheme.typography.titleMedium.copy(
+            color = CustomTheme.colors.loginEnable,
+            fontSize = 36.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+
+    @Composable
+    fun getEmptyStateSynopsisStyle(): TextStyle {
+        return MaterialTheme.typography.bodySmall.copy(
+            color = CustomTheme.colors.loginButtonDisable
+        )
+    }
+
+    @Composable
+    fun getDeleteLectureDescriptionStyle(): TextStyle {
+        return MaterialTheme.typography.bodyMedium.copy(
+            color = CustomTheme.colors.dialogText,
+            fontWeight = FontWeight.Bold
         )
     }
 }
