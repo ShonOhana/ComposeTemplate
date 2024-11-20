@@ -70,7 +70,6 @@ fun AuthScreen(
                         if (success && exception == null)
                             navigator.navigate(MainScreens.Lectures)
                     },
-
                 )
             }
 
