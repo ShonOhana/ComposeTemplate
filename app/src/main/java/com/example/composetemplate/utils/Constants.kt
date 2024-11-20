@@ -58,6 +58,8 @@ class Constants {
         const val FORGOT_PASSWORD_TEXT = "Enter your email"
         const val FORGOT_PASSWORD_TITLE = "Forgot Password"
         const val FORGOT_PASSWORD_BUTTON_TEXT = "Send email"
+        const val LECTURE_CARD_PAST_TIME_TEXT = "This lecture as past"
+        const val LECTURE_CARD_NEXT_LECTURE_TEXT = "Next Lecture"
 
         //Logs Messages
         const val CONFIG_FETCHED_SUCCESSFULLY = "config params fetched successfully, is updated:"

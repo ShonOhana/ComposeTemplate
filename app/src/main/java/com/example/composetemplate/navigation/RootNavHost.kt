@@ -11,6 +11,8 @@ import com.example.composetemplate.presentation.screens.main_screens.MainViewMod
 import com.example.composetemplate.presentation.screens.entry_screens.SplashScreen
 import com.example.composetemplate.presentation.screens.main_screens.HomeScreen
 import com.example.composetemplate.presentation.screens.main_screens.FavoritesScreen
+import com.example.composetemplate.presentation.screens.main_screens.LectureScreen
+import com.example.composetemplate.presentation.screens.main_screens.viewmodels.LecturesViewModel
 import com.example.composetemplate.utils.extensions.sharedViewModel
 
 /**
@@ -73,10 +75,14 @@ fun NavGraphBuilder.entryNavGraph(
 fun NavGraphBuilder.mainNavGraph(
     navigator: Navigator
 ) {
-    navigation<MainGraph>(startDestination = MainScreens.Home) {
+    navigation<MainGraph>(startDestination = MainScreens.Lectures) {
         composable<MainScreens.Home> { entry ->
             val vm = entry.sharedViewModel<MainViewModel>(navController = navigator.navHostController)
             HomeScreen(navigator,vm)
+        }
+        composable<MainScreens.Lectures> { entry ->
+            val vm = entry.sharedViewModel<LecturesViewModel>(navController = navigator.navHostController)
+            LectureScreen(viewModel = vm)
         }
         composable<MainScreens.Favorites> { entry ->
             val vm = entry.sharedViewModel<MainViewModel>(navController = navigator.navHostController)

@@ -92,7 +92,6 @@ fun LoginTextField(
         )
     Spacer(modifier = modifier.height(12.dp))
 
-    // Automatically request focus and show the keyboard
     if (isFirstEditText) {
         LaunchedEffect(Unit) {
             focusRequester?.requestFocus()
