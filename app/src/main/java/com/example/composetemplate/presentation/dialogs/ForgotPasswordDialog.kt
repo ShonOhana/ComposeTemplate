@@ -26,6 +26,7 @@ import com.example.composetemplate.presentation.screens.entry_screens.login.Auth
 import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
 import com.example.composetemplate.utils.Constants.Companion.FORGOT_PASSWORD_BUTTON_TEXT
 import com.example.composetemplate.utils.Constants.Companion.FORGOT_PASSWORD_TITLE
+import com.example.composetemplate.utils.extensions.isValidEmail
 
 
 @Composable
@@ -85,6 +86,9 @@ fun ForgotPasswordDialog(
                 // Button below the TextField
                 LoginScreenButton(
                     onClick = {
+                        if (!viewModel.forgotPasswordMail.isValidEmail()) {
+                            return@LoginScreenButton
+                        }
                         viewModel.resetPassword(viewModel.forgotPasswordMail)
                         viewModel.setForgotDialogVisibility(false)
                     },
