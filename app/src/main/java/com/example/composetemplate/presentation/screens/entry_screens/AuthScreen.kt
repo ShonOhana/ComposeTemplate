@@ -45,7 +45,7 @@ fun AuthScreen(
                 .imePadding()
                 .pointerInput(Unit) {
                     detectTapGestures {
-                        focusManager.clearFocus() // Clear focus to close the keyboard
+                        focusManager.clearFocus()
                     }
                 },
             verticalArrangement = Arrangement.Top,
@@ -61,8 +61,6 @@ fun AuthScreen(
                         if (success && exception == null)
                             navigator.navigate(MainScreens.Lectures)
                     },
-                    // TODO: this is in the branch of firebase that need to approved pr and then remove the comment because now its conflict because it doesnt exist
-//                errorManager = authViewModel.errorManager
                 )
 
                 AuthScreenState.Register -> RegisterScreen(
@@ -72,10 +70,10 @@ fun AuthScreen(
                         if (success && exception == null)
                             navigator.navigate(MainScreens.Lectures)
                     },
-                    // TODO: this is in the branch of firebase that need to approved pr and then remove the comment because now its conflict because it doesnt exist
-//                errorManager = authViewModel.errorManager
+
                 )
             }
+
         }
     }
 }

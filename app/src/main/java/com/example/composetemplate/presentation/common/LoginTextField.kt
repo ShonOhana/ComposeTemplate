@@ -36,9 +36,11 @@ fun LoginTextField(
     isValid: Boolean,
     onValueChange: (String) -> Unit,
     isLastEditText: Boolean = false,
+    isFirstEditText: Boolean = false,
     leadingIcon: @Composable (() -> Unit)? = null,
     focusRequester: FocusRequester ? = null,
-    onNextFocusRequest: FocusRequester? = null
+    onNextFocusRequest: (() -> Unit)? = null,
+    onDoneClick: (() -> Unit)? = null
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var isFocused by remember { mutableStateOf(false) }
@@ -81,19 +83,19 @@ fun LoginTextField(
         keyboardOptions = loginScreenEnum.getKeyboardOptions(isLastEditText),
         keyboardActions = KeyboardActions(
             onNext = {
-                onNextFocusRequest?.requestFocus() // Move to next TextField
+                onNextFocusRequest?.invoke()
             },
-            onDone = {
-                keyboardController?.hide()
-            }
+            onDone = { onDoneClick?.invoke() }
         ),
         visualTransformation = loginScreenEnum.getVisualTransformation(),
 
         )
-    // Automatically request focus and show the keyboard
-//    LaunchedEffect(Unit) {
-//        focusRequester?.requestFocus()
-//        keyboardController?.show()
-//    }
     Spacer(modifier = modifier.height(12.dp))
+
+    if (isFirstEditText) {
+        LaunchedEffect(Unit) {
+            focusRequester?.requestFocus()
+            keyboardController?.show()
+        }
+    }
 }
