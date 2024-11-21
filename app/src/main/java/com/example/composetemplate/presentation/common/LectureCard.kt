@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composetemplate.R
 import com.example.composetemplate.data.models.server_models.Lecture
+import com.example.composetemplate.data.remote.analytics.AnalyticsLogger.Companion.logLectureTopic
 import com.example.composetemplate.ui.theme.CustomTheme
 import com.example.composetemplate.utils.Constants.Companion.LECTURE_CARD_NEXT_LECTURE_TEXT
 import com.example.composetemplate.utils.Constants.Companion.LECTURE_CARD_PAST_TIME_TEXT
@@ -43,7 +44,9 @@ fun LectureCard(
             .fillMaxWidth()
             .height(if (isExpanded) 300.dp else 150.dp)
             .padding(8.dp)
-            .clickable { },
+            .clickable {
+                logLectureTopic(lecture.topic)
+            },
         shape = RoundedCornerShape(0.dp, 13.dp, 13.dp, 13.dp),
         colors = CardDefaults.cardColors(containerColor = CustomTheme.colors.loginEnable)
     ) {

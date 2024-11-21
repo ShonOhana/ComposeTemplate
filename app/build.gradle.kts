@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.firebase.config.ktx)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.play.services.measurement.api)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit.v121)
     androidTestImplementation(libs.androidx.espresso.core.v361)
