@@ -1,7 +1,6 @@
 package com.example.composetemplate.data.remote.analytics
 
 import android.os.Bundle
-import android.util.Log
 import com.example.composetemplate.data.remote.analytics.AnalyticsManager.AnalyticsConstants.ItemName
 import com.example.composetemplate.data.remote.analytics.AnalyticsManager.AnalyticsConstants.Value
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -16,12 +15,25 @@ object AnalyticsManager {
         firebaseAnalytics.setAnalyticsCollectionEnabled(false)
     }
 
-    object AnalyticsConstants{
+    object AnalyticsConstants {
         const val ItemName = "item_name"
         const val Value = "value"
     }
 
-    fun logAnalytics(analyticsParameters: AnalyticsParameters) {
+    fun <T> logEvent(data: T, event: AnalyticsParameters.Events) {
+        when (event) {
+            AnalyticsParameters.Events.SELECT_LECTURE -> {
+                logAnalytics(
+                    AnalyticsParameters(
+                        event,
+                        itemName = data as? String
+                    )
+                )
+            }
+        }
+    }
+
+    private fun logAnalytics(analyticsParameters: AnalyticsParameters) {
 
         val bundle = Bundle()
 
@@ -29,5 +41,21 @@ object AnalyticsManager {
         analyticsParameters.value?.let { bundle.putString(Value, it) }
 
         firebaseAnalytics.logEvent(analyticsParameters.event.rawValue, bundle)
+    }
+}
+
+data class AnalyticsParameters(
+    val event: Events,
+    val itemName: String? = null,
+    val value: String? = null,
+) {
+
+    enum class Events {
+        SELECT_LECTURE;
+
+        val rawValue: String
+            get() = when (this) {
+                SELECT_LECTURE -> this.name.lowercase()
+            }
     }
 }
