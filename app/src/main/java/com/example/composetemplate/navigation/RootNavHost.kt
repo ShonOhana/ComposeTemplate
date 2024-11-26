@@ -9,9 +9,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.composetemplate.presentation.screens.main_screens.MainViewModel
 import com.example.composetemplate.presentation.screens.entry_screens.SplashScreen
+import com.example.composetemplate.presentation.screens.main_screens.BluetoothScreen
 import com.example.composetemplate.presentation.screens.main_screens.HomeScreen
 import com.example.composetemplate.presentation.screens.main_screens.FavoritesScreen
 import com.example.composetemplate.presentation.screens.main_screens.LectureScreen
+import com.example.composetemplate.presentation.screens.main_screens.viewmodels.BluetoothViewModel
 import com.example.composetemplate.presentation.screens.main_screens.viewmodels.LecturesViewModel
 import com.example.composetemplate.utils.extensions.sharedViewModel
 
@@ -86,6 +88,11 @@ fun NavGraphBuilder.mainNavGraph(
         }
         composable<MainScreens.Favorites> { entry ->
             val vm = entry.sharedViewModel<MainViewModel>(navController = navigator.navHostController)
-            FavoritesScreen(vm) }
+            FavoritesScreen(vm)
+        }
+        composable<MainScreens.BlueTooth> { entry ->
+            val vm = entry.sharedViewModel<BluetoothViewModel>(navController = navigator.navHostController)
+            BluetoothScreen(navigator,vm)
+        }
     }
 }

@@ -20,6 +20,7 @@ enum class AppScreen{
     Auth,
     Advertisement,
     Home,
+    BlueTooth,
     Lectures,
     Favorites
 }
@@ -64,5 +65,10 @@ sealed class MainScreens : NavigableScreen {
     data object Lectures : NavigableScreen {
         override val screen: AppScreen
             get() = AppScreen.Lectures
+    }
+    @Serializable
+    data object BlueTooth : NavigableScreen {
+        override val screen: AppScreen
+            get() = AppScreen.BlueTooth
     }
 }

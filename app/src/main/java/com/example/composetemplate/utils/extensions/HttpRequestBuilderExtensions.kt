@@ -29,7 +29,7 @@ suspend fun HttpRequestBuilder.buildRequest(request: BaseRequest) {
     url {
         method = request.method
         protocol = URLProtocol.HTTPS
-        host = request.baseUrl
+        host = request.baseUrl.removePrefix(prefixRemoveUrlBuilder).removeSuffix("/")
         contentType(ContentType.Application.Json)
         request.path?.let { appendPathSegments(it) }
         val queries = request.queries ?: hashMapOf()
@@ -52,3 +52,4 @@ suspend fun HttpRequestBuilder.buildRequest(request: BaseRequest) {
     }
     request.body?.let { setBody(it) }
 }
+private val prefixRemoveUrlBuilder = "https://"

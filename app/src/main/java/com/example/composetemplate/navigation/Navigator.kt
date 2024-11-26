@@ -40,6 +40,7 @@ class Navigator {
                 }
             }
             AppScreen.Lectures,
+            AppScreen.BlueTooth,
             AppScreen.Home -> {
                 /* When the app navigates to the home screen we want to remove all the EntryGraph from the back stack */
                 navigateAndRemoveGraph<EntryGraph>(navigableScreen)

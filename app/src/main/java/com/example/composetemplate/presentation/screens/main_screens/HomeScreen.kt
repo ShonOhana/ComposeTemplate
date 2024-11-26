@@ -14,7 +14,7 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(
     navigator: Navigator,
     vm:MainViewModel,
-    authViewModel: AuthViewModel = koinViewModel()
+//    authViewModel: AuthViewModel = koinViewModel()
 ){
     LaunchedEffect(Unit) {
         vm.getDataFromServer()
@@ -22,7 +22,7 @@ fun HomeScreen(
         vm.writeDataToDS()
         // TODO: remove when we get design to logout,
         //  meanwhile we logged out every exit of the screen because we work on auth screen
-        authViewModel.logOut()
+//        authViewModel.logOut()
     }
     BasicScreen(Color.Magenta,"Home"){
         navigator.navigate(MainScreens.Favorites)
