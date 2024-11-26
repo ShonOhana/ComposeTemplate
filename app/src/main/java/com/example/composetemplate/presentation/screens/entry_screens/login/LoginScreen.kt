@@ -165,7 +165,7 @@ fun LoginScreen(
                 Text(
                     modifier = Modifier
                         .padding(bottom = 16.dp)
-                        .clickable { viewModel.setForgotDialogVisibility(true) },
+                        .clickable { viewModel.setDialogVisibility(true) },
                     text = "Forgot Password",
                     color = CustomTheme.colors.text,
                     style = MaterialTheme.typography.labelLarge

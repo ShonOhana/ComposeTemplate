@@ -33,10 +33,10 @@ import com.example.composetemplate.utils.extensions.isValidEmail
 fun ForgotPasswordDialog(
     viewModel: AuthViewModel
 ) {
-    if (viewModel.isForgotDialogVisible) {
+    if (viewModel.isDialogVisible) {
         BaseNativeDialog(
             modifier = Modifier,
-            onDismissRequest = { viewModel.setForgotDialogVisibility(false) }) {
+            onDismissRequest = { viewModel.setDialogVisibility(false) }) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -90,7 +90,7 @@ fun ForgotPasswordDialog(
                             return@LoginScreenButton
                         }
                         viewModel.resetPassword(viewModel.forgotPasswordMail)
-                        viewModel.setForgotDialogVisibility(false)
+                        viewModel.setDialogVisibility(false)
                     },
                     isEnabled = true,
                     modifier = Modifier

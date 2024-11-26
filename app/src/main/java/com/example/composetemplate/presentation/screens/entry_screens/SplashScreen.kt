@@ -2,12 +2,15 @@ package com.example.composetemplate.presentation.screens.entry_screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import com.example.composetemplate.navigation.EntryScreens
 import com.example.composetemplate.navigation.MainScreens
 import com.example.composetemplate.navigation.Navigator
 import com.example.composetemplate.presentation.components.BasicScreen
 import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
+import com.example.composetemplate.utils.UIState
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
@@ -17,6 +20,8 @@ fun SplashScreen(
     authViewModel: AuthViewModel = koinViewModel()
 ) {
     BasicScreen(Color.Yellow, "Splash")
+    /* It's good practice to keep navigation logic separate from your Composable. This ensures a cleaner separation of concerns. */
+    val userState by authViewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
         val fiveSeconds = 5000L
         delay(fiveSeconds)
@@ -38,12 +43,12 @@ fun SplashScreen(
          * Therefore, if you wish to share complex data like a large list of objects or if your data is relevant for multiple screens, use the ViewModel.
          * @see com.example.composetemplate.presentation.screens.main_screens.MainViewModel
          */
-        authViewModel.getUser { user, exception ->
-            if (user != null && exception == null)
-                navigator.navigate(MainScreens.Lectures)
-            else
-                navigator.navigate(EntryScreens.Auth)
+        userState?.let { userState ->
+            when (userState) {
+                is UIState.Loading -> Unit
+                is UIState.Success -> navigator.navigate(MainScreens.Lectures)
+                is UIState.Error -> navigator.navigate(EntryScreens.Auth)
+            }
         }
-
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.composetemplate.base.BaseViewModel
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.CONFIRM_PASSWORD
@@ -31,19 +32,8 @@ import java.util.logging.ErrorManager
  * not support coroutines
  * */
 class AuthViewModel(
-    private val authInteractor: AuthInteractor,
-) : ViewModel() {
-
-    // set the uiState of the auth page
-    val uiAuthState = MutableStateFlow<UIState<Boolean>?>(null)
-
-    //progress visibility according to uiState
-    private val _isProgressVisible = mutableStateOf(false)
-    val isProgressVisible: Boolean by _isProgressVisible
-
-    //forgot password dialog visibility
-    private val _isForgotDialogVisible = mutableStateOf(false)
-    val isForgotDialogVisible: Boolean by _isForgotDialogVisible
+    private val authInteractor: AuthInteractor
+) : BaseViewModel() {
 
     //authentication data parameters according to loginScreen statement
     private val _signInData = mutableStateOf(SignInData())
@@ -53,37 +43,13 @@ class AuthViewModel(
     private val _forgotPasswordMail = mutableStateOf("")
     val forgotPasswordMail: String by _forgotPasswordMail
 
-
     init {
-        initPageState()
-    }
-
-    /** This is the flow that set the UI according to the data */
-    private fun initPageState() {
-        viewModelScope.launch {
-            uiAuthState.collect { state ->
-                if (state != null) {
-                    when (state) {
-                        is UIState.Error -> {
-                            _isProgressVisible.value = false
-                        }
-
-                        is UIState.Loading -> {
-                            _isProgressVisible.value = true
-                        }
-
-                        is UIState.Success -> {
-                            _isProgressVisible.value = false
-                        }
-                    }
-                }
-            }
-        }
+        getUser()
     }
 
     fun createEmailPasswordUser(successCallback: SuccessCallback) {
         viewModelScope.launch {
-            uiAuthState.value = UIState.Loading()
+            uiState.value = UIState.Loading()
             val loginParams =
                 NonSocialLoginParameter(signupData.email, signupData.password, signupData.fullName)
             // Get data from the repository (IO scope)
@@ -95,12 +61,12 @@ class AuthViewModel(
                     // Switch to Main dispatcher to update the UI
                     withContext(Dispatchers.Main) {
                         if (user != null && exception == null) {
+                            getUser()
                             _signupData.value = signupData.copy(authError = null)
-                            uiAuthState.value = UIState.Success(true)
                             successCallback(true, null)
                         } else {
+                            uiState.value = UIState.Error(exception?.message)
                             _signupData.value = signupData.copy(authError = exception?.message)
-                            uiAuthState.value = UIState.Error(exception?.message)
                             successCallback(false, exception)
                         }
                     }
@@ -109,23 +75,18 @@ class AuthViewModel(
         }
     }
 
-    fun getUser(loginCallback: LoginCallback) {
-        // Get data from the repository (IO scope)
+    fun getUser() {
         authInteractor.getUser { user, exception ->
-            viewModelScope.launch {
-                // Switch to Main dispatcher to update the UI
-                withContext(Dispatchers.Main) {
-                    if (user != null && exception == null)
-                        loginCallback(user, null)
-                    else
-                        loginCallback(null, exception)
-                }
+            user?.let {
+                uiState.value = UIState.Success(user)
+            } ?: run {
+                uiState.value = UIState.Error(exception?.message)
             }
         }
     }
 
     fun signInEmailAndPassword(successCallback: SuccessCallback) {
-        uiAuthState.value = UIState.Loading()
+        uiState.value = UIState.Loading()
         val loginParams = NonSocialLoginParameter(signInData.email, signInData.password)
         // Get data from the repository (IO scope)
         authInteractor.login(
@@ -136,12 +97,12 @@ class AuthViewModel(
                 // Switch to Main dispatcher to update the UI
                 withContext(Dispatchers.Main) {
                     if (user != null && exception == null) {
+                        getUser()
                         _signInData.value = signInData.copy(authError = null)
-                        uiAuthState.value = UIState.Success(true)
                         successCallback(true, null)
                     } else {
+                        uiState.value = UIState.Error(exception?.message)
                         _signInData.value = signInData.copy(authError = exception?.message)
-                        uiAuthState.value = UIState.Error(exception?.message)
                         successCallback(false, exception)
                     }
                 }
@@ -185,7 +146,6 @@ class AuthViewModel(
                 when (authTextFieldsEnum) {
                     AuthTextFieldsEnum.FORGOT_PASSWORD,
                     EMAIL -> signInData.isEmailValid
-
                     PASSWORD -> signInData.isPasswordValid
                     FULL_NAME -> false
                     CONFIRM_PASSWORD -> false
@@ -236,10 +196,6 @@ class AuthViewModel(
         }
     }
 
-    fun setForgotDialogVisibility(isVisible: Boolean) {
-        _isForgotDialogVisible.value = isVisible
-    }
-
     /** Logout fun to use whenever we need to logout
      * NOTE: meanwhile I use it when I change loginState otherwise we would get permission denied
      * if we try to sign in or register if we already logged in.
@@ -247,12 +203,12 @@ class AuthViewModel(
     fun logOut() = authInteractor.logOut()
 
     fun resetPassword(email: String) {
-        uiAuthState.value = UIState.Loading()
+        uiState.value = UIState.Loading()
         authInteractor.resetPassword(email) { success, exception ->
             if (success && exception == null)
-                uiAuthState.value = UIState.Success(true)
+                uiState.value = UIState.Success(true)
             else
-                uiAuthState.value = UIState.Error(exception?.message)
+                uiState.value = UIState.Error(exception?.message)
         }
     }
 }

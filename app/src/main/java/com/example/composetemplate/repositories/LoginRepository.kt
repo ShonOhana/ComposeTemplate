@@ -48,7 +48,7 @@ class LoginRepository(
         if (user.email.isEmpty().not()) {
             authActionable.signInWithEmailAndPassword(user, password) { createdUser, exception ->
                 if (createdUser != null && exception == null)
-                    createOrUpdateUser(user, loginCallback)
+                    loginCallback(user, null)
                 else {
                     loginCallback(null, exception)
                 }
@@ -71,10 +71,14 @@ class LoginRepository(
                         val remoteUser = response.body<User>()
                         loginCallback(remoteUser,null)
                     } ?: run {
+                        logOut()
                         loginCallback(null,Exception())// check exception
                     }
                 }
-            } else loginCallback(null,exception)
+            } else {
+                logOut()
+                loginCallback(null,exception)
+            }
         }
     }
 
