@@ -75,7 +75,7 @@ class AuthViewModel(
         }
     }
 
-    fun getUser() {
+    private fun getUser() {
         authInteractor.getUser { user, exception ->
             user?.let {
                 uiState.value = UIState.Success(user)

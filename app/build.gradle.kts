@@ -123,4 +123,6 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.core)
 
     implementation(libs.androidx.constraintlayout.compose)
+
+    implementation(libs.kotlinx.datetime)
 }

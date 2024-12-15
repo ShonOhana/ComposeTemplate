@@ -127,7 +127,7 @@ fun LectureCard(
             Spacer(modifier = modifier.height(6.dp))
 
             Text(
-                text = if (lecture.isPast) LECTURE_CARD_PAST_TIME_TEXT else DateUtil.lectureFormatDate(lecture.dueDate),
+                text = if (lecture.isPast) LECTURE_CARD_PAST_TIME_TEXT else lecture.dueDateString,
                 style = CustomTheme.typography.getLectureTimeStampStyle(lecture.isPast),
                 modifier = Modifier.padding(start = 8.dp)
             )
