@@ -3,18 +3,25 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import java.io.IOException
+import java.util.UUID
 
 class BluetoothManager(private val context: Context) {
+
+    private var bluetoothSocket: BluetoothSocket? = null
 
     private val bluetoothManager: BluetoothManager =
         context.getSystemService(BluetoothManager::class.java)
@@ -40,14 +47,104 @@ class BluetoothManager(private val context: Context) {
      * Start Bluetooth discovery.
      * @return True if discovery started successfully, false otherwise.
      */
-    fun startDiscovery(onPermissionNeeded: (Array<String>) -> Unit) {
-        val permissionList = getBluetoothPermissionsToRequest()
-        if (permissionList.isNotEmpty()) {
-            onPermissionNeeded(permissionList)
+    fun startDiscovery(
+        onDeviceFound: (BluetoothDevice) -> Unit,
+        onPermissionNeeded: (Array<String>) -> Unit,
+        onDiscoveryStatusChanged: (Boolean) -> Unit
+    ) {
+        if (!bluetoothAdapter.isEnabled) {
+            enableBluetooth(onPermissionNeeded)
             return
         }
-        // TODO: if false notice the bluetooth is off
+        onDiscoveryStatusChanged(true) // Notify discovery started
         bluetoothAdapter?.startDiscovery()
+
+        val filter = IntentFilter().apply {
+            addAction(BluetoothDevice.ACTION_FOUND)
+            addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+        }
+
+        context.registerReceiver(object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                when (intent.action) {
+                    BluetoothDevice.ACTION_FOUND -> {
+                        val device: BluetoothDevice? =
+                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                        device?.let { onDeviceFound(it) }
+                    }
+                    BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
+                        onDiscoveryStatusChanged(false) // Notify discovery finished
+                    }
+                }
+            }
+        }, filter)
+    }
+
+
+    @SuppressLint("MissingPermission")
+    fun connectToDevice(
+        device: BluetoothDevice,
+//        onSuccess: (BluetoothSocket) -> Unit,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+//        try {
+            if (bluetoothAdapter?.isEnabled == true && bluetoothAdapter.isDiscovering) {
+                cancelDiscovery()
+            }
+
+        val s = device.createBond()
+        if (s)
+            onSuccess()
+        else
+            onError(Exception("Failed to create socket"))
+
+
+////            val sppUuid = device.uuids[3]?.uuid ?: UUID.fromString("0000110A-0000-1000-8000-00805F9B34FB")
+//            val sppUuid = device.uuids?.firstOrNull()?.uuid ?: UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+//            val socket = try {
+//                device.createRfcommSocketToServiceRecord(sppUuid)
+//            } catch (e: Exception) {
+//                device.javaClass
+//                    .getMethod("createRfcommSocket", Int::class.java)
+//                    .invoke(device, 1) as BluetoothSocket
+//            }
+//
+//            socket?.let {
+//                it.connect()
+//                bluetoothSocket = it // Store the connected socket
+//                onSuccess(it)
+//            } ?: onError(Exception("Failed to create socket"))
+//
+//        } catch (e: Exception) {
+//            Log.e("Bluetooth", "Connection failed", e)
+//            onError(e)
+//        }
+    }
+
+    /**
+     * Disconnect the currently connected Bluetooth device.
+     */
+    fun disconnectDevice(onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        try {
+            bluetoothSocket?.apply {
+                close()
+                bluetoothSocket = null
+                onSuccess()
+            }
+        } catch (e: IOException) {
+            onError(e)
+        }
+    }
+
+    /**
+     * Route audio to the connected Bluetooth device.
+     */
+    fun routeAudioToBluetooth() {
+        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager.isBluetoothScoOn = true
+        audioManager.startBluetoothSco()
+        audioManager.mode = AudioManager.MODE_NORMAL
     }
 
     /**

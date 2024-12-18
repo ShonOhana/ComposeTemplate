@@ -1,7 +1,9 @@
 package com.example.composetemplate.presentation.screens.main_screens.viewmodels
 
 import BluetoothManager
+import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
+import android.util.Log
 import com.example.composetemplate.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +18,15 @@ import kotlinx.coroutines.flow.asStateFlow
 class BluetoothViewModel(
     private val bluetoothManager: BluetoothManager
 ) : BaseViewModel() {
+
+    private val _devices = MutableStateFlow<List<BluetoothDevice>>(emptyList())
+    val devices = _devices.asStateFlow()
+
+    private val _isDiscovering = MutableStateFlow(false)
+    val isDiscovering = _isDiscovering.asStateFlow()
+
+    private val _connectionStatus = MutableStateFlow<String>("Not connected")
+    val connectionStatus = _connectionStatus.asStateFlow()
 
     /**
      * StateFlow to hold the array of permissions that need to be requested.
@@ -63,14 +74,57 @@ class BluetoothViewModel(
     }
 
     /**
-     * Initiates the Bluetooth device discovery process. If permissions are needed,
-     * it notifies the UI through [_permissionToRequest].
+     * Start discovering Bluetooth devices.
+     * If permissions are needed, notify the UI to handle them.
      */
     fun startDiscovery() {
-        bluetoothManager.startDiscovery { permissionNeeded ->
-            // Notify the UI to request permission
-            _permissionToRequest.value = permissionNeeded
-        }
+        bluetoothManager.startDiscovery(
+            onDeviceFound = { device ->
+                _devices.value = _devices.value + device
+            },
+            onPermissionNeeded = { permissions ->
+                _permissionToRequest.value = permissions
+            },
+            onDiscoveryStatusChanged = { isDiscovering ->
+                _isDiscovering.value = isDiscovering
+            }
+        )
+    }
+
+    fun connectToDevice(device: BluetoothDevice) {
+        bluetoothManager.connectToDevice(
+            device = device,
+            onSuccess = {
+                _connectionStatus.value = "Connected to ${device.name ?: "Unknown"}"
+                // You can use the socket to send/receive data here
+            },
+            onError = { error ->
+                _connectionStatus.value = "Connection failed: ${error.message}"
+            }
+        )
+    }
+
+    fun disconnectDevice() {
+        bluetoothManager.disconnectDevice(
+            onSuccess = {
+                _connectionStatus.value = "Disconnected"
+            },
+            onError = { error ->
+                _connectionStatus.value = "Disconnection failed: ${error.localizedMessage}"
+            }
+        )
+    }
+
+    fun onDeviceDiscovered(device: BluetoothDevice) {
+        _devices.value = _devices.value + device
+    }
+
+    fun onDiscoveryStarted() {
+        _isDiscovering.value = true
+    }
+
+    fun onDiscoveryFinished() {
+        _isDiscovering.value = false
     }
 
     /**

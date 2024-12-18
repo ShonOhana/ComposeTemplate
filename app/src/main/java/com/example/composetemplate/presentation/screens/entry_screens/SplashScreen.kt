@@ -23,7 +23,7 @@ fun SplashScreen(
     /* It's good practice to keep navigation logic separate from your Composable. This ensures a cleaner separation of concerns. */
     val userState by authViewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
-        val fiveSeconds = 1000L
+        val fiveSeconds = 3000L
         delay(fiveSeconds)
         // parameter to pass data for example
         val isUserAuthorized = false
@@ -43,14 +43,13 @@ fun SplashScreen(
          * Therefore, if you wish to share complex data like a large list of objects or if your data is relevant for multiple screens, use the ViewModel.
          * @see com.example.composetemplate.presentation.screens.main_screens.MainViewModel
          */
-        navigator.navigate(MainScreens.BlueTooth)
-        // TODO: This Comment is until we solve firebase db problem
-//        userState?.let { userState ->
-//            when (userState) {
-//                is UIState.Loading -> Unit
-//                is UIState.Success -> navigator.navigate(MainScreens.BlueTooth)
-//                is UIState.Error -> navigator.navigate(EntryScreens.Auth)
-//            }
-//        }
+
+        userState?.let { userState ->
+            when (userState) {
+                is UIState.Loading -> Unit
+                is UIState.Success -> navigator.navigate(MainScreens.BlueTooth)
+                is UIState.Error -> navigator.navigate(EntryScreens.Auth)
+            }
+        }
     }
 }

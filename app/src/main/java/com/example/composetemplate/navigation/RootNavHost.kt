@@ -92,7 +92,7 @@ fun NavGraphBuilder.mainNavGraph(
         }
         composable<MainScreens.BlueTooth> { entry ->
             val vm = entry.sharedViewModel<BluetoothViewModel>(navController = navigator.navHostController)
-            BluetoothScreen(navigator,vm)
+            BluetoothScreen(vm)
         }
     }
 }
