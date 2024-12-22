@@ -2,10 +2,11 @@ package com.example.composetemplate.presentation.screens.entry_screens.register
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.example.composetemplate.base.BaseViewModel
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
+import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.CONFIRM_PASSWORD
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.EMAIL
@@ -13,17 +14,14 @@ import com.example.composetemplate.presentation.screens.entry_screens.login.Auth
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.PASSWORD
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthScreenState
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignInData
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignInResult
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpData
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
 import com.example.composetemplate.repositories.AuthInteractor
-import com.example.composetemplate.utils.LoginCallback
 import com.example.composetemplate.utils.LoginProvider
-import com.example.composetemplate.utils.SuccessCallback
 import com.example.composetemplate.utils.UIState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.logging.ErrorManager
 
 /**
  * NOTE: In this class we use Firebase auth that work with old callback and does not support coroutines.
@@ -35,78 +33,127 @@ class AuthViewModel(
     private val authInteractor: AuthInteractor
 ) : BaseViewModel() {
 
-    //authentication data parameters according to loginScreen statement
-    private val _signInData = mutableStateOf(SignInData())
-    val signInData: SignInData by _signInData
-    private val _signupData = mutableStateOf(SignUpData())
-    val signupData: SignUpData by _signupData
-    private val _forgotPasswordMail = mutableStateOf("")
-    val forgotPasswordMail: String by _forgotPasswordMail
+    var signInData by mutableStateOf(SignInData())
+        private set
+    var signupData by mutableStateOf(SignUpData())
+        private set
+    var forgotPasswordMail by mutableStateOf("")
+        private set
 
-    init {
-        getUser()
+    val signInResult = MutableStateFlow<SignInResult?>(null)
+
+    fun fetchUserData(authScreenState: AuthScreenState?) {
+        viewModelScope.launch {
+            when (val signInResult = authInteractor.getUser()) {
+                SignInResult.Cancelled -> setSignInResultState(
+                    signInResult,
+                    authScreenState,
+                    null,
+                    null
+                )
+
+                is SignInResult.Failure -> setSignInResultState(
+                    signInResult,
+                    authScreenState,
+                    signInResult.errorable?.errorType?.messageKey,
+                    null
+                )
+
+                is SignInResult.NoCredentials -> setSignInResultState(
+                    signInResult,
+                    authScreenState,
+                    signInResult.errorable?.errorType?.messageKey,
+                    null
+                )
+
+                is SignInResult.Success -> setSignInResultState(
+                    signInResult,
+                    authScreenState,
+                    null,
+                    signInResult.user
+                )
+            }
+        }
     }
 
-    fun createEmailPasswordUser(successCallback: SuccessCallback) {
+    fun signInEmailAndPassword() {
         viewModelScope.launch {
             uiState.value = UIState.Loading()
-            val loginParams =
-                NonSocialLoginParameter(signupData.email, signupData.password, signupData.fullName)
-            // Get data from the repository (IO scope)
-            authInteractor.login(
+            val loginParams = NonSocialLoginParameter(signInData.email, signInData.password)
+            val signInResult = authInteractor.login(
+                LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD,
+                loginParams
+            ) as? SignInResult ?: return@launch
+
+            when (signInResult) {
+                SignInResult.Cancelled -> setSignInResultState(
+                    signInResult,
+                    AuthScreenState.Login,
+                    null,
+                    null
+                )
+
+                is SignInResult.Failure -> setSignInResultState(
+                    signInResult,
+                    AuthScreenState.Login,
+                    signInResult.errorable?.errorType?.messageKey,
+                    null
+                )
+
+                is SignInResult.NoCredentials -> setSignInResultState(
+                    signInResult,
+                    AuthScreenState.Login,
+                    signInResult.errorable?.errorType?.messageKey,
+                    null
+                )
+
+                is SignInResult.Success -> fetchUserData(AuthScreenState.Login)
+            }
+        }
+    }
+
+    fun createEmailPasswordUser() {
+        viewModelScope.launch {
+            uiState.value = UIState.Loading()
+            val loginParams = NonSocialLoginParameter(
+                email = signupData.email,
+                password = signupData.password,
+                fullName = signupData.fullName
+            )
+            val registerResult = authInteractor.login(
                 LoginProvider.REGISTER_WITH_EMAIL_AND_PASSWORD,
                 loginParams
-            ) { user, exception ->
-                viewModelScope.launch {
-                    // Switch to Main dispatcher to update the UI
-                    withContext(Dispatchers.Main) {
-                        if (user != null && exception == null) {
-                            getUser()
-                            _signupData.value = signupData.copy(authError = null)
-                            successCallback(true, null)
-                        } else {
-                            uiState.value = UIState.Error(exception?.message)
-                            _signupData.value = signupData.copy(authError = exception?.message)
-                            successCallback(false, exception)
-                        }
-                    }
-                }
+            ) as? SignUpResult ?: return@launch
+
+            when (registerResult) {
+                SignUpResult.Cancelled -> setSignInResultState(
+                    SignInResult.Cancelled,
+                    AuthScreenState.Register,
+                    null,
+                    null
+                )
+
+                is SignUpResult.Failure -> setSignInResultState(
+                    SignInResult.Failure(registerResult.errorable),
+                    AuthScreenState.Register,
+                    registerResult.errorable?.errorType?.messageKey,
+                    null
+                )
+
+                is SignUpResult.Success -> fetchUserData(AuthScreenState.Register)
             }
         }
     }
 
-    private fun getUser() {
-        authInteractor.getUser { user, exception ->
-            user?.let {
-                uiState.value = UIState.Success(user)
-            } ?: run {
-                uiState.value = UIState.Error(exception?.message)
-            }
-        }
-    }
+    /** Logout fun to use whenever we need to logout
+     * NOTE: meanwhile I use it when I change loginState otherwise we would get permission denied
+     * if we try to sign in or register if we already logged in.
+     * */
+    fun logOut() = authInteractor.logOut()
 
-    fun signInEmailAndPassword(successCallback: SuccessCallback) {
-        uiState.value = UIState.Loading()
-        val loginParams = NonSocialLoginParameter(signInData.email, signInData.password)
-        // Get data from the repository (IO scope)
-        authInteractor.login(
-            LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD,
-            loginParams
-        ) { user, exception ->
-            viewModelScope.launch {
-                // Switch to Main dispatcher to update the UI
-                withContext(Dispatchers.Main) {
-                    if (user != null && exception == null) {
-                        getUser()
-                        _signInData.value = signInData.copy(authError = null)
-                        successCallback(true, null)
-                    } else {
-                        uiState.value = UIState.Error(exception?.message)
-                        _signInData.value = signInData.copy(authError = exception?.message)
-                        successCallback(false, exception)
-                    }
-                }
-            }
+    fun resetPassword(email: String) {
+        viewModelScope.launch {
+            authInteractor.resetPassword(email)
         }
     }
 
@@ -146,6 +193,7 @@ class AuthViewModel(
                 when (authTextFieldsEnum) {
                     AuthTextFieldsEnum.FORGOT_PASSWORD,
                     EMAIL -> signInData.isEmailValid
+
                     PASSWORD -> signInData.isPasswordValid
                     FULL_NAME -> false
                     CONFIRM_PASSWORD -> false
@@ -174,20 +222,20 @@ class AuthViewModel(
         when (authScreenState) {
             AuthScreenState.Login -> {
                 when (authTextFieldsEnum) {
-                    EMAIL -> _signInData.value = signInData.copy(email = newValue)
-                    PASSWORD -> _signInData.value = signInData.copy(password = newValue)
+                    EMAIL -> signInData = signInData.copy(email = newValue)
+                    PASSWORD -> signInData = signInData.copy(password = newValue)
                     FULL_NAME -> {}
                     CONFIRM_PASSWORD -> {}
-                    AuthTextFieldsEnum.FORGOT_PASSWORD -> _forgotPasswordMail.value = newValue
+                    AuthTextFieldsEnum.FORGOT_PASSWORD -> forgotPasswordMail = newValue
                 }
             }
 
             AuthScreenState.Register -> {
                 when (authTextFieldsEnum) {
-                    FULL_NAME -> _signupData.value = signupData.copy(fullName = newValue)
-                    EMAIL -> _signupData.value = signupData.copy(email = newValue)
-                    PASSWORD -> _signupData.value = signupData.copy(password = newValue)
-                    CONFIRM_PASSWORD -> _signupData.value =
+                    FULL_NAME -> signupData = signupData.copy(fullName = newValue)
+                    EMAIL -> signupData = signupData.copy(email = newValue)
+                    PASSWORD -> signupData = signupData.copy(password = newValue)
+                    CONFIRM_PASSWORD -> signupData =
                         signupData.copy(confirmPassword = newValue)
 
                     AuthTextFieldsEnum.FORGOT_PASSWORD -> {}
@@ -196,19 +244,22 @@ class AuthViewModel(
         }
     }
 
-    /** Logout fun to use whenever we need to logout
-     * NOTE: meanwhile I use it when I change loginState otherwise we would get permission denied
-     * if we try to sign in or register if we already logged in.
-     * */
-    fun logOut() = authInteractor.logOut()
-
-    fun resetPassword(email: String) {
-        uiState.value = UIState.Loading()
-        authInteractor.resetPassword(email) { success, exception ->
-            if (success && exception == null)
-                uiState.value = UIState.Success(true)
-            else
-                uiState.value = UIState.Error(exception?.message)
+    private fun setSignInResultState(
+        signInResult: SignInResult,
+        authScreenState: AuthScreenState?,
+        errorMessageKey: String?,
+        user: User?,
+    ) {
+        if (user != null) uiState.value = UIState.Success(user)
+        else uiState.value = UIState.Error(errorMessageKey)
+        this.signInResult.value = signInResult
+        authScreenState ?: return
+        when (authScreenState) {
+            AuthScreenState.Login -> signInData.authError = errorMessageKey
+            AuthScreenState.Register -> signupData.authError = errorMessageKey
         }
     }
+
+//    suspend fun signUp() = authInteractor.signUp("Shon","123456")
+
 }

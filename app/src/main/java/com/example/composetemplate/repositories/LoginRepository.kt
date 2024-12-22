@@ -1,20 +1,24 @@
 package com.example.composetemplate.repositories
 
+import com.example.composetemplate.data.local.CacheData.user
+import com.example.composetemplate.data.models.local_models.ErrorType
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.remote.base.BaseRequest
+import com.example.composetemplate.data.remote.errors.APIError
+import com.example.composetemplate.data.remote.errors.AuthError
 import com.example.composetemplate.data.remote.requests.FirebaseUserRequests
 import com.example.composetemplate.managers.MainNetworkManager
-import com.example.composetemplate.utils.LoginCallback
-import com.example.composetemplate.utils.SuccessCallback
+import com.example.composetemplate.presentation.screens.entry_screens.login.LoginResults
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignInResult
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
+import com.example.composetemplate.utils.extensions.errorType
 import com.example.composetemplate.utils.extensions.isSuccessful
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 interface AuthDbServiceable {
-    fun createOrUpdateUser(user: User, loginCallback: LoginCallback)
-    fun getUser(loginCallback: LoginCallback)
+    suspend fun createOrUpdateUser(user: User): Boolean
+    suspend fun getUser(): LoginResults
 }
 /**
  *
@@ -25,7 +29,6 @@ interface AuthDbServiceable {
 class LoginRepository(
     private val authActionable: AuthActionable,
     private val networkManager: MainNetworkManager,
-    private val ioScope: CoroutineScope,
 ): AuthDbServiceable {
 
     enum class RequestType {
@@ -33,61 +36,87 @@ class LoginRepository(
     }
 
     /** create user by email and password */
-    fun registerUser(user: User, password: String, loginCallback: LoginCallback) {
-        authActionable.createUserWithEmailAndPassword(user, password) { createdUser, exception ->
-            if (createdUser != null && exception == null)
-                createOrUpdateUser(user, loginCallback)
-            else {
-                loginCallback(null, exception)
+    suspend fun registerUser(user: User, password: String): SignUpResult {
+        return try {
+            when(val result = authActionable.createUserWithEmailAndPassword(user, password)) {
+                SignUpResult.Cancelled -> SignUpResult.Cancelled
+                is SignUpResult.Failure -> SignUpResult.Failure(result.errorable)
+                is SignUpResult.Success -> {
+                    createOrUpdateUser(user)
+                    SignUpResult.Success(user)
+                }
             }
+        } catch (e: Exception) {
+            SignUpResult.Failure(AuthError(e.errorType))
         }
     }
 
     /** sign in user by email and password */
-    fun signInEmailPasswordUser(user: User, password: String, loginCallback: LoginCallback) {
-        if (user.email.isEmpty().not()) {
-            authActionable.signInWithEmailAndPassword(user, password) { createdUser, exception ->
-                if (createdUser != null && exception == null)
-                    loginCallback(user, null)
-                else {
-                    loginCallback(null, exception)
+    suspend fun signInEmailPasswordUser(user: User, password: String): SignInResult {
+        return try {
+            when(val result = authActionable.signInWithEmailAndPassword(user, password)) {
+                is SignInResult.NoCredentials -> SignInResult.NoCredentials(result.errorable)
+                SignInResult.Cancelled -> SignInResult.Cancelled
+                is SignInResult.Failure -> SignInResult.Failure(result.errorable)
+                is SignInResult.Success -> {
+                    SignInResult.Success(user)
                 }
             }
-        } else
-            loginCallback(null, Exception("email is empty"))
-    }
-
-    fun logOut() = authActionable.logout()
-
-    fun resetPassword(email: String, successCallback: SuccessCallback) = authActionable.resetPassword(email,successCallback)
-
-    override fun getUser(loginCallback: LoginCallback) {
-        authActionable.getUser { user, exception ->
-            if (exception == null) {
-                ioScope.launch {
-                    val baseRequest = createBaseRequest(RequestType.GET_USER, authActionable, user) ?: return@launch
-                    val httpResponse = (networkManager.sendRequest(baseRequest) as? HttpResponse)
-                    httpResponse?.let { response ->
-                        val remoteUser = response.body<User>()
-                        loginCallback(remoteUser,null)
-                    } ?: run {
-                        logOut()
-                        loginCallback(null,Exception())// check exception
-                    }
-                }
-            } else {
-                logOut()
-                loginCallback(null,exception)
-            }
+        } catch (e: Exception) {
+            SignInResult.Failure(AuthError(e.errorType))
         }
     }
 
-    override fun createOrUpdateUser(user: User, loginCallback: LoginCallback) {
-        ioScope.launch {
-            val baseRequest = createBaseRequest(RequestType.CREATE_USER, authActionable, user) ?: return@launch
-            val httpResponse = (networkManager.sendRequest(baseRequest) as? HttpResponse)
-            val success = httpResponse?.isSuccessful() == true
-            if (success) loginCallback(user, null) else loginCallback(null, Exception())
+//    fun signInWithGoogle(activity: Activity,successCallback: SuccessCallback ){
+//        ioScope.launch {
+//            googleAuth.googleSignIn(activity, successCallback)
+//        }
+//    }
+
+    fun logOut() = authActionable.logout()
+
+    suspend fun resetPassword(email: String) = authActionable.resetPassword(email)
+
+    override suspend fun getUser(): SignInResult {
+        return try {
+            when(val result = authActionable.getUser()) {
+                SignInResult.Cancelled -> {
+                    logOut()
+                    SignInResult.Cancelled
+                }
+                is SignInResult.Failure -> {
+                    logOut()
+                    SignInResult.Failure(result.errorable)
+                }
+                is SignInResult.NoCredentials -> {
+                    logOut()
+                    SignInResult.NoCredentials(result.errorable)
+                }
+                is SignInResult.Success -> {
+                    val baseRequest = createBaseRequest(RequestType.GET_USER, authActionable, user)
+                        ?: return SignInResult.Failure(AuthError(ErrorType.UNKNOWN_ERROR)) //todo: check the error in httpResponse
+                    val httpResponse = networkManager.sendRequest(baseRequest) as? HttpResponse
+                    httpResponse?.let { response ->
+                        val remoteUser = response.body<User>()
+                        SignInResult.Success(remoteUser)
+                    } ?: run {
+                        logOut()
+                        SignInResult.Failure(AuthError(ErrorType.UNKNOWN_ERROR)) //todo: check the error in httpResponse
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            SignInResult.Failure(AuthError(e.errorType))
+        }
+    }
+
+    override suspend fun createOrUpdateUser(user: User): Boolean {
+        val baseRequest = createBaseRequest(RequestType.CREATE_USER, authActionable, user) ?: return false
+        return try {
+            val httpResponse = networkManager.sendRequest(baseRequest) as? HttpResponse
+            httpResponse?.isSuccessful() == true
+        } catch (e: Exception) {
+            false
         }
     }
 

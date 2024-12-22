@@ -1,11 +1,14 @@
 package com.example.composetemplate.repositories
 
+import com.example.composetemplate.data.models.local_models.ErrorType
 import com.example.composetemplate.data.models.local_models.LoginParameterizable
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.models.server_models.PermissionType
-import com.example.composetemplate.utils.LoginCallback
-import com.example.composetemplate.utils.SuccessCallback
+import com.example.composetemplate.data.remote.errors.AuthError
+import com.example.composetemplate.presentation.screens.entry_screens.login.LoginResults
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
+
 
 /**
  * @Interactor explanation:
@@ -27,35 +30,49 @@ class AuthInteractor(
 
     /** @LoginProvider make us to implement every auth type we would like to add*/
     enum class LoginProvider{
-        REGISTER_WITH_EMAIL_AND_PASSWORD, SIGN_IN_WITH_EMAIL_AND_PASSWORD;
+        REGISTER_WITH_EMAIL_AND_PASSWORD, SIGN_IN_WITH_EMAIL_AND_PASSWORD , GOOGLE_SIGN_IN;
     }
 
     /**
      *  @login is a method with 1 purpose so we want to login we call login method
      * that's why every other login types methods are private and we call then according to @LoginProvider
      */
-    fun login(loginProvider: LoginProvider, loginParams: LoginParameterizable, loginCallback: LoginCallback){
+    suspend fun login(loginProvider: LoginProvider, loginParams: LoginParameterizable): LoginResults {
         when(loginProvider){
             LoginProvider.REGISTER_WITH_EMAIL_AND_PASSWORD -> {
                 val email = (loginParams as? NonSocialLoginParameter)?.email ?: ""
                 val password = loginParams.password
                 val user = User(email = email, fullName = loginParams.fullName, permissionType = PermissionType.DEVELOPER.name.lowercase())
-                loginRepository.registerUser(user,password, loginCallback)
+                return loginRepository.registerUser(user,password)
             }
             LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD -> {
                 val email = (loginParams as? NonSocialLoginParameter)?.email ?: ""
                 val password = loginParams.password
                 val user = User(email = email, fullName = "", permissionType = PermissionType.DEVELOPER.name.lowercase())
-                loginRepository.signInEmailPasswordUser(user,password, loginCallback)
+                return loginRepository.signInEmailPasswordUser(user,password)
             }
+//
+//            LoginProvider.GOOGLE_SIGN_IN -> {
+//                loginRepository.signInWithGoogle(loginCallback)
+//            }
+            else -> {}
         }
+        return SignUpResult.Failure(AuthError(ErrorType.UNKNOWN_ERROR)) //todo: fix
     }
 
     /** Get user from database */
-    fun getUser(loginCallback: LoginCallback) = loginRepository.getUser(loginCallback)
+    suspend fun getUser() = loginRepository.getUser()
 
     fun logOut() = loginRepository.logOut()
 
-    fun resetPassword(email: String, successCallback: SuccessCallback) = loginRepository.resetPassword(email,successCallback)
+    suspend fun resetPassword(email: String) = loginRepository.resetPassword(email)
+
+
+
+
+    //testtttt
+//    suspend fun signUp(username: String, password: String) = accountManager.signUp(username, password)
+//
+//    suspend fun signIn() = accountManager.signIn()
 
 }

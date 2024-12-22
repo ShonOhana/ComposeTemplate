@@ -1,15 +1,21 @@
 package com.example.composetemplate.repositories
 
 import android.util.Base64
+import com.example.composetemplate.data.local.CacheData.user
+import com.example.composetemplate.data.models.local_models.ErrorType
 import com.example.composetemplate.data.models.local_models.User
+import com.example.composetemplate.data.remote.errors.AuthError
 import com.example.composetemplate.managers.TokenData
 import com.example.composetemplate.managers.TokenFetcher
-import com.example.composetemplate.utils.LoginCallback
-import com.example.composetemplate.utils.SuccessCallback
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignInResult
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
+import com.example.composetemplate.utils.extensions.errorType
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.tasks.await
 import org.json.JSONObject
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * In the MVVM architecture, the DataSource layer is responsible for providing data to the repository
@@ -20,60 +26,76 @@ class FirebaseActionable : AuthActionable, TokenFetcher {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    override fun createUserWithEmailAndPassword(
+    override suspend fun createUserWithEmailAndPassword(
         user: User,
-        password: String,
-        loginCallback: LoginCallback
-    ) {
-        if (user.email.isNotEmpty()) {
-            auth.createUserWithEmailAndPassword(user.email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful)
-                        loginCallback(user, null)
-                    else
-                        loginCallback(null, task.exception)
-                }
-        } else {
-            loginCallback(null, Exception("Email is empty"))
+        password: String
+    ) : SignUpResult {
+        if (user.email.isEmpty()) {
+            return SignUpResult.Cancelled
+        }
+        return try {
+            val result = auth.createUserWithEmailAndPassword(user.email, password).await()
+            if (result.user != null) {
+                SignUpResult.Success(user)
+            } else {
+                SignUpResult.Failure(AuthError(ErrorType.USER_NOT_FOUND))
+            }
+        } catch (e: Exception) {
+            SignUpResult.Failure(AuthError(e.errorType))
         }
     }
 
-    override fun signInWithEmailAndPassword(
+    override suspend fun signInWithEmailAndPassword(
         user: User,
-        password: String,
-        loginCallback: LoginCallback
-    ) {
-        if (user.email.isNotEmpty()) {
-            auth.signInWithEmailAndPassword(user.email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful)
-                        loginCallback(user, null)
-                    else
-                        loginCallback(null, task.exception)
-                }
-        } else {
-            loginCallback(null, Exception("Email is empty"))
+        password: String
+    ): SignInResult {
+
+        if (user.email.isEmpty()) {
+            return SignInResult.Cancelled
+        }
+        return try {
+            val result = auth.signInWithEmailAndPassword(user.email, password).await()
+            if (result.user != null) {
+                SignInResult.Success(user)
+            } else {
+                SignInResult.Failure(AuthError(ErrorType.USER_NOT_FOUND))
+            }
+        } catch (e: Exception) {
+            SignInResult.Failure(AuthError(e.errorType))
         }
     }
 
-    override fun getUser(loginCallback: LoginCallback) {
-        if (auth.currentUser == null)
-            loginCallback(null, Exception("No user"))
+    override suspend fun getUser(): SignInResult {
+        return if (auth.currentUser != null)
+            SignInResult.Success(null)
         else
-            loginCallback(null, null)
+            SignInResult.NoCredentials(AuthError(ErrorType.USER_NOT_FOUND))
     }
 
     override fun logout() = auth.signOut()
 
-    override fun resetPassword(email: String, successCallback: SuccessCallback) {
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    successCallback(true, null)
-                } else {
-                    successCallback(false, task.exception)
+    override suspend fun resetPassword(email: String) {
+        suspendCancellableCoroutine{ continuation ->
+            auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        continuation.resume(Unit) // Resumes with success
+                    } else {
+                        val exception = task.exception ?: Exception("Unknown error occurred")
+                        continuation.resumeWithException(exception) // Resumes with failure
+                    }
                 }
-            }
+        }
+//        return suspendCancellableCoroutine { continuation ->
+//            auth.sendPasswordResetEmail(email)
+//                .addOnCompleteListener { task ->
+//                    if (task.isSuccessful) {
+//                        continuation.resume(true) // Success
+//                    } else {
+//                        continuation.resume(false) // Failure
+//                    }
+//                }
+//        }
     }
 
     /**

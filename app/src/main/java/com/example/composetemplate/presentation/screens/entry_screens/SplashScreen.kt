@@ -23,7 +23,8 @@ fun SplashScreen(
     /* It's good practice to keep navigation logic separate from your Composable. This ensures a cleaner separation of concerns. */
     val userState by authViewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
-        val fiveSeconds = 5000L
+        authViewModel.fetchUserData(null)
+        val fiveSeconds = 3000L
         delay(fiveSeconds)
         // parameter to pass data for example
         val isUserAuthorized = false

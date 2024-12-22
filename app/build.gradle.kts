@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.example.composetemplate"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.composetemplate"
-        minSdk = 24
-        targetSdk = 34
+        minSdk = 26
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -124,5 +124,10 @@ dependencies {
 
     implementation(libs.androidx.constraintlayout.compose)
 
+    /* Datetime */
     implementation(libs.kotlinx.datetime)
+
+    /* Google */
+    implementation(libs.androidx.credentials.core)
+    implementation(libs.androidx.credentials.compat)
 }

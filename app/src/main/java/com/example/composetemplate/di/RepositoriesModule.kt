@@ -10,6 +10,6 @@ import org.koin.dsl.module
 val repositoriesModule = module {
     factory { TestRepository(get(),get()) }
     factory <AuthActionable> { FirebaseActionable() }
-    factory { LoginRepository(get(),get(),get()) }
+    factory { LoginRepository(get(),get()) }
     factory { LecturesRepository(get()) }
 }

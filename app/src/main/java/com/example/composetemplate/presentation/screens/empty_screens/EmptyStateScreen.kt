@@ -17,6 +17,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.composetemplate.R
+import com.example.composetemplate.data.models.local_models.ErrorType
+import com.example.composetemplate.managers.StringsKeyManager.EMPTY_STATE_NO_LECTURES_MESSAGE
+import com.example.composetemplate.managers.StringsKeyManager.EMPTY_STATE_NO_LECTURES_TITLE
+import com.example.composetemplate.managers.StringsKeyManager.EMPTY_STATE_NO_NETWORK_MESSAGE
+import com.example.composetemplate.managers.StringsKeyManager.EMPTY_STATE_NO_NETWORK_TITLE
+import com.example.composetemplate.managers.StringsKeyManager.EMPTY_STATE_PERMISSION_DENIED_MESSAGE
+import com.example.composetemplate.managers.StringsKeyManager.EMPTY_STATE_PERMISSION_DENIED_TITLE
+import com.example.composetemplate.managers.StringsKeyManager.EMPTY_STATE_SERVER_ERROR_MESSAGE
+import com.example.composetemplate.managers.StringsKeyManager.EMPTY_STATE_SERVER_ERROR_TITLE
 import com.example.composetemplate.ui.theme.CustomTheme
 import com.example.composetemplate.ui.theme.CustomTheme.colors
 import com.example.composetemplate.utils.Constants.Companion.EMPTY_STATE_ACCESS_DENIED_SYNOPSIS
@@ -27,6 +36,7 @@ import com.example.composetemplate.utils.Constants.Companion.EMPTY_STATE_NO_INTE
 import com.example.composetemplate.utils.Constants.Companion.EMPTY_STATE_NO_INTERNET_TITLE
 import com.example.composetemplate.utils.Constants.Companion.EMPTY_STATE_NO_LECTURE_SYNOPSIS
 import com.example.composetemplate.utils.Constants.Companion.EMPTY_STATE_NO_LECTURE_TITLE
+import com.example.composetemplate.utils.StringProvider
 import com.example.composetemplate.utils.exceptions.NoDataException
 import com.example.composetemplate.utils.exceptions.NoInternetConnectionException
 import com.example.composetemplate.utils.exceptions.UnauthorizedException
@@ -47,40 +57,40 @@ import java.lang.Exception
 @Composable
 fun EmptyStateScreen(
     modifier: Modifier = Modifier,
-    exception: Exception?,
+    errorType: ErrorType?,
 ) {
-    when (exception) {
-        is UnauthorizedException -> {
+    when (errorType) {
+        ErrorType.UNAUTHORIZED -> {
             EmptyListScreen(
                 modifier = modifier,
                 drawableResource = R.drawable.access_denied,
-                title = EMPTY_STATE_ACCESS_DENIED_TITLE,
-                synopsis = EMPTY_STATE_ACCESS_DENIED_SYNOPSIS
+                title = StringProvider.getString(EMPTY_STATE_PERMISSION_DENIED_TITLE),
+                synopsis = StringProvider.getString(EMPTY_STATE_PERMISSION_DENIED_MESSAGE)
             )
         }
-        is NoInternetConnectionException -> {
+        ErrorType.NETWORK_ERROR -> {
             EmptyListScreen(
                 modifier = modifier,
                 drawableResource = R.drawable.no_signal,
-                title = EMPTY_STATE_NO_INTERNET_TITLE,
-                synopsis = EMPTY_STATE_NO_INTERNET_SYNOPSIS
+                title = StringProvider.getString(EMPTY_STATE_NO_NETWORK_TITLE),
+                synopsis = StringProvider.getString(EMPTY_STATE_NO_NETWORK_MESSAGE)
             )
         }
         /* Display a default empty list screen if there's a parse exception or no data */
-        is NoDataException -> {
+        ErrorType.NO_DATA -> {
             EmptyListScreen(
                 modifier = modifier,
                 drawableResource = R.drawable.empty_list,
-                title = EMPTY_STATE_NO_LECTURE_TITLE,
-                synopsis = EMPTY_STATE_NO_LECTURE_SYNOPSIS
+                title = StringProvider.getString(EMPTY_STATE_NO_LECTURES_TITLE),
+                synopsis = StringProvider.getString(EMPTY_STATE_NO_LECTURES_MESSAGE)
             )
         }
         else -> {
             EmptyListScreen(
                 modifier = modifier,
                 drawableResource = R.drawable.general_bug,
-                title = EMPTY_STATE_GENERAL_BUG_TITLE,
-                synopsis = EMPTY_STATE_GENERAL_BUG_SYNOPSIS
+                title = StringProvider.getString(EMPTY_STATE_SERVER_ERROR_TITLE),
+                synopsis = StringProvider.getString(EMPTY_STATE_SERVER_ERROR_MESSAGE)
             )
         }
     }

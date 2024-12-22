@@ -25,17 +25,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.composetemplate.managers.StringsKeyManager.ALREADY_HAVE_ACCOUNT_TEXT
+import com.example.composetemplate.managers.StringsKeyManager.REGISTER_BUTTON
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthScreenState
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignInResult
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
 import com.example.composetemplate.presentation.screens.entry_screens.login.loginFields
 import com.example.composetemplate.ui.theme.CustomTheme
 import com.example.composetemplate.utils.Constants
 import com.example.composetemplate.utils.Constants.Companion.HAVE_ACCOUNT_TEXT
 import com.example.composetemplate.utils.Constants.Companion.LOGIN_TEXT
 import com.example.composetemplate.utils.Constants.Companion.UNKNOWN_EXCEPTION
-import com.example.composetemplate.utils.SuccessCallback
+import com.example.composetemplate.utils.StringProvider
 import kotlinx.coroutines.launch
 import java.util.logging.ErrorManager
 
@@ -51,8 +55,19 @@ fun RegisterScreen(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel,
     onLoginClicked: () -> Unit,
-    isRegisterSucceed: SuccessCallback,
+    isRegisterSucceed: (Boolean) -> Unit,
 ) {
+    val signUpResult by viewModel.signInResult.collectAsState()
+    LaunchedEffect(signUpResult) {
+        signUpResult?.let { result ->
+            when(result) {
+                SignInResult.Cancelled,
+                is SignInResult.Failure,
+                is SignInResult.NoCredentials -> isRegisterSucceed(false)
+                is SignInResult.Success -> isRegisterSucceed(true)
+            }
+        }
+    }
     val errorMessage = viewModel.signupData.authError
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -101,8 +116,9 @@ fun RegisterScreen(
                         },
                         onDoneClick = {
                             val isValid = viewModel.signupData.isValidRegisterPage
-                            if (isValid)
-                                viewModel.createEmailPasswordUser(isRegisterSucceed)
+                            if (isValid){
+                                viewModel.createEmailPasswordUser()
+                            }
                             keyboardController?.hide()
                         }
                     )
@@ -112,7 +128,7 @@ fun RegisterScreen(
                 Text(
                     modifier = modifier
                         .padding(horizontal = 24.dp),
-                    text = errorMessage ?: UNKNOWN_EXCEPTION,
+                    text = StringProvider.getString(errorMessage) ?: UNKNOWN_EXCEPTION,
                     color = CustomTheme.colors.error,
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.Center
@@ -124,15 +140,15 @@ fun RegisterScreen(
                     .padding(top = 12.dp)
                     .padding(horizontal = 24.dp),
                 isEnabled = viewModel.signupData.isValidRegisterPage,
-                text = LOGIN_TEXT
+                text = StringProvider.getString(REGISTER_BUTTON)
             ) {
-                viewModel.createEmailPasswordUser(isRegisterSucceed)
+                viewModel.createEmailPasswordUser()
             }
             Text(
                 modifier = modifier
                     .padding(top = 12.dp)
                     .clickable { onLoginClicked() },
-                text = HAVE_ACCOUNT_TEXT,
+                text = StringProvider.getString(ALREADY_HAVE_ACCOUNT_TEXT),
                 color = CustomTheme.colors.text,
                 style = MaterialTheme.typography.labelLarge
             )

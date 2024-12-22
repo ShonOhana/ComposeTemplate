@@ -36,18 +36,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.composetemplate.R
+import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
 import com.example.composetemplate.presentation.screens.main_screens.viewmodels.LecturesViewModel
 import com.example.composetemplate.ui.theme.CustomTheme
 import com.example.composetemplate.ui.theme.CustomTheme.colors
+import com.example.composetemplate.utils.StringProvider
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LectureScreen(
     modifier: Modifier = Modifier,
-    layoutDirection: LayoutDirection = LayoutDirection.Ltr,
-    viewModel: LecturesViewModel = koinViewModel()
-) {
+    layoutDirection: LayoutDirection = StringProvider.getCurrentLanguage().getLayoutDirection(),
+    viewModel: LecturesViewModel = koinViewModel(),
+    authViewModel: AuthViewModel = koinViewModel(),
+    ) {
     CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         val lectures by viewModel.lectures.collectAsState()
 
@@ -132,6 +135,7 @@ fun LectureScreen(
                         }
                     }
                 }
+                authViewModel.logOut()
             }
         )
     }

@@ -25,7 +25,10 @@ object FirebaseConfigProvider {
     enum class RemoteConfigValues {
         /* Networking */
         BASE_URL,
-        BASE_FIREBASE_URL
+        BASE_FIREBASE_URL,
+        /* String Files */
+        STRING_EN,
+        STRING_HE,
     }
 
     inline fun <reified T> getData(key: RemoteConfigValues): T {
