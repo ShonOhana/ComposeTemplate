@@ -2,6 +2,7 @@ package com.example.composetemplate.data.remote.base
 
 import com.example.composetemplate.utils.LogsManager
 import com.example.composetemplate.utils.extensions.buildRequest
+import com.example.composetemplate.utils.extensions.errorType
 import com.example.composetemplate.utils.extensions.handleErrors
 import com.example.composetemplate.utils.extensions.handleJson
 import com.example.composetemplate.utils.extensions.installLogger
@@ -37,6 +38,8 @@ abstract class BaseNetworking : BaseServerClient {
             }.body()
         } catch (exception: Exception) {
             LogsManager().logServerError(exception.message)
+            /* Return the exception object (NetworkException) to handle or debug the error further */
+            exception.errorType
             null
         }
     }

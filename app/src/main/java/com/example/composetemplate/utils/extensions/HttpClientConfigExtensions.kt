@@ -1,5 +1,6 @@
 package com.example.composetemplate.utils.extensions
 
+import com.example.composetemplate.data.models.local_models.ErrorType
 import com.example.composetemplate.utils.LogsManager
 import com.example.composetemplate.utils.exceptions.BadRequestException
 import com.example.composetemplate.utils.exceptions.InternalServerErrorException
@@ -44,19 +45,15 @@ fun HttpClientConfig<CIOEngineConfig>.handleErrors() {
         validateResponse { response ->
             val statusCode = response.status.value
             if (statusCode != 200) {
-                NetworkExceptions.entries.forEach { exception ->
-                    if (exception.code == statusCode) {
-                        throw when (exception) {
-                            NetworkExceptions.UnauthorizedException -> UnauthorizedException()
-                            NetworkExceptions.BadRequestException -> BadRequestException()
-                            NetworkExceptions.NotFoundException -> NotFoundException()
-                            NetworkExceptions.TimeOutException -> TimeOutException()
-                            NetworkExceptions.InternalServerErrorException -> InternalServerErrorException()
-                            NetworkExceptions.ServiceUnavailableException -> ServiceUnavailableException()
-                        }
-                    }
+                throw when (statusCode) {
+                    ErrorType.UNAUTHORIZED.statusCode -> UnauthorizedException()
+                    ErrorType.BAD_REQUEST.statusCode -> BadRequestException()
+                    ErrorType.K404_NOT_FOUND.statusCode -> NotFoundException()
+                    ErrorType.TIME_OUT.statusCode-> TimeOutException()
+                    ErrorType.INTERNAL_SERVER.statusCode -> InternalServerErrorException()
+                    ErrorType.SERVICE_UNAVAILABLE.statusCode -> ServiceUnavailableException()
+                    else -> UnknownServerException(statusCode)
                 }
-                throw UnknownServerException(statusCode)
             }
         }
     }
