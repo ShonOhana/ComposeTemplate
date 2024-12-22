@@ -1,7 +1,6 @@
 package com.example.composetemplate.repositories
 
 import android.util.Base64
-import com.example.composetemplate.data.local.CacheData.user
 import com.example.composetemplate.data.models.local_models.ErrorType
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.remote.errors.AuthError
@@ -18,18 +17,25 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 /**
- * In the MVVM architecture, the DataSource layer is responsible for providing data to the repository
- * from various sources, such as remote APIs, local databases, or in-memory caches.
- * allowing the repository to seamlessly aggregate and supply data to the ViewModel without worrying about the underlying data origins or access mechanisms.
+ * The FirebaseActionable class handles all Firebase authentication tasks.
+ * It manages user sign-up, sign-in, password reset, and token fetching using Firebase Authentication SDK.
+ * This class also implements TokenFetcher to retrieve and manage the Firebase token.
  */
 class FirebaseActionable : AuthActionable, TokenFetcher {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
+    /**
+     * Registers a new user using email and password.
+     *
+     * @param user The user object containing user details.
+     * @param password The password for the new user.
+     * @return The result of the sign-up operation.
+     */
     override suspend fun createUserWithEmailAndPassword(
         user: User,
         password: String
-    ) : SignUpResult {
+    ): SignUpResult {
         if (user.email.isEmpty()) {
             return SignUpResult.Cancelled
         }
@@ -45,11 +51,17 @@ class FirebaseActionable : AuthActionable, TokenFetcher {
         }
     }
 
+    /**
+     * Signs in an existing user using email and password.
+     *
+     * @param user The user object containing user details.
+     * @param password The user's password.
+     * @return The result of the sign-in operation.
+     */
     override suspend fun signInWithEmailAndPassword(
         user: User,
         password: String
     ): SignInResult {
-
         if (user.email.isEmpty()) {
             return SignInResult.Cancelled
         }
@@ -65,6 +77,11 @@ class FirebaseActionable : AuthActionable, TokenFetcher {
         }
     }
 
+    /**
+     * Retrieves the current user from Firebase.
+     *
+     * @return The sign-in result indicating whether the user is signed in or not.
+     */
     override suspend fun getUser(): SignInResult {
         return if (auth.currentUser != null)
             SignInResult.Success(null)
@@ -72,10 +89,18 @@ class FirebaseActionable : AuthActionable, TokenFetcher {
             SignInResult.NoCredentials(AuthError(ErrorType.USER_NOT_FOUND))
     }
 
+    /**
+     * Logs out the current user from Firebase.
+     */
     override fun logout() = auth.signOut()
 
+    /**
+     * Sends a password reset email to the user.
+     *
+     * @param email The email address to send the password reset link.
+     */
     override suspend fun resetPassword(email: String) {
-        suspendCancellableCoroutine{ continuation ->
+        suspendCancellableCoroutine { continuation ->
             auth.sendPasswordResetEmail(email)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -86,26 +111,14 @@ class FirebaseActionable : AuthActionable, TokenFetcher {
                     }
                 }
         }
-//        return suspendCancellableCoroutine { continuation ->
-//            auth.sendPasswordResetEmail(email)
-//                .addOnCompleteListener { task ->
-//                    if (task.isSuccessful) {
-//                        continuation.resume(true) // Success
-//                    } else {
-//                        continuation.resume(false) // Failure
-//                    }
-//                }
-//        }
     }
 
     /**
-     * Get the token from Firebase. if we have it and its still valid use the token that exist,
-     * otherwise if he doesn't exist or not valid bring the new token.
+     * Fetches the current Firebase token. If the token is valid, it will be used; otherwise, a new token is fetched.
+     * Firebase tokens are valid for 1 hour, so this method will refresh the token if it is expired.
      *
-     * Firebase token valid for an hour so in that way if the user is in the app for more then an
-     * hour we need to refresh the token because its not valid.
-     * and we don't need to get the token in every call as long its valid
-     * */
+     * @return A [TokenData] object containing the token and its expiration time.
+     */
     override suspend fun fetchToken(): TokenData {
         return suspendCancellableCoroutine { continuation ->
             auth.currentUser?.getIdToken(true)?.addOnCompleteListener { task ->
@@ -120,26 +133,30 @@ class FirebaseActionable : AuthActionable, TokenFetcher {
         }
     }
 
-    /** Parse the expiration date from token in firebase mode.*/
+    /**
+     * Parses the expiration date from the Firebase ID token.
+     *
+     * @param token The Firebase ID token as a String.
+     * @return The expiration time of the token in milliseconds.
+     */
     private fun parseExpirationDate(token: String?): Long {
         return try {
             token ?: return 0L
-            // Split the token into parts: header, payload, and signature
+            // Split the token into its components (header, payload, signature)
             val parts = token.split(".")
             if (parts.size != 3) {
                 return 0L // Invalid token format
             }
 
-            // Decode the payload part from Base64
+            // Decode the payload from Base64 URL-safe encoding
             val payload = String(Base64.decode(parts[1], Base64.URL_SAFE))
             // Parse the payload as a JSON object
             val jsonObject = JSONObject(payload)
-            // Get the expiration time (exp) from the JSON object (convert seconds to milliseconds)
+            // Extract the expiration time (exp) and convert from seconds to milliseconds
             jsonObject.optLong("exp", 0) * 1000
         } catch (e: Exception) {
             e.printStackTrace()
-            0L
+            0L // Return 0 if parsing fails
         }
     }
-
 }
