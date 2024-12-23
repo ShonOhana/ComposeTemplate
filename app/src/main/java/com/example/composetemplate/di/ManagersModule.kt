@@ -3,7 +3,7 @@ package com.example.composetemplate.di
 import com.example.composetemplate.managers.FirebaseConfigurationManager
 import com.example.composetemplate.managers.DataStoreManager
 import com.example.composetemplate.managers.MainNetworkManager
-import com.plcoding.credentialmanagerguidecompose.GoogleCredentialManager
+import com.example.composetemplate.managers.GoogleCredentialManager
 import org.koin.dsl.module
 
 val managersModule = module {

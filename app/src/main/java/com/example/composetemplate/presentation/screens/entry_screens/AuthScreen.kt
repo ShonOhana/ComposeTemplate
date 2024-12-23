@@ -52,7 +52,7 @@ fun AuthScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             FullScreenProgressBar(authViewModel.isProgressVisible)
-            LoginPageHeader()
+            LoginPageHeader(authViewModel = authViewModel)
             when (currentScreen) {
                 AuthScreenState.Login -> LoginScreen(
                     viewModel = authViewModel,

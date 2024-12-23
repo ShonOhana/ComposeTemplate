@@ -1,10 +1,10 @@
 package com.example.composetemplate.repositories
 
+import android.content.Intent
 import com.example.composetemplate.data.local.CacheData.user
-import com.example.composetemplate.data.models.local_models.ErrorType
+import com.example.composetemplate.data.models.local_models.GoogleAuthUiClientParameters
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.remote.base.BaseRequest
-import com.example.composetemplate.data.remote.errors.APIError
 import com.example.composetemplate.data.remote.errors.AuthError
 import com.example.composetemplate.data.remote.requests.FirebaseUserRequests
 import com.example.composetemplate.managers.MainNetworkManager
@@ -32,6 +32,7 @@ interface AuthDbServiceable {
  */
 class LoginRepository(
     private val authActionable: AuthActionable,
+    private val googleAuthActionable: GoogleAuthActionable,
     private val networkManager: MainNetworkManager
 ) : AuthDbServiceable {
 
@@ -54,8 +55,9 @@ class LoginRepository(
                 SignUpResult.Cancelled, is SignUpResult.Failure -> result
                 /* On successful creation, update the user in the local database */
                 is SignUpResult.Success -> {
-                    createOrUpdateUser(user)
-                    result
+                    val success = createOrUpdateUser(user)
+                    if (success) result
+                    else SignUpResult.Cancelled
                 }
             }
         } catch (e: Exception) {
@@ -74,9 +76,63 @@ class LoginRepository(
     suspend fun signInEmailPasswordUser(user: User, password: String) = authActionable.signInWithEmailAndPassword(user, password)
 
     /**
+     * Signs in a user with the provided intent from Google authentication.
+     *
+     * This function handles the Google sign-in process. If the sign-in is successful, it checks if
+     * the user already exists in the database. If the user does not exist, it creates or updates the user.
+     * It ensures that no unnecessary server call is made if the user already exists.
+     *
+     * @param intent The intent containing Google sign-in data.
+     * @return The result of the sign-in attempt, either successful or failure.
+     */
+    suspend fun signInWithIntent(intent: Intent?): SignInResult {
+        /* Attempt to sign in with the provided intent */
+        when(val signInResult = googleAuthActionable.signInWithIntent(intent)) {
+            /* If the sign-in is cancelled, failed, or has no credentials, return that result */
+            SignInResult.Cancelled,
+            is SignInResult.Failure,
+            is SignInResult.NoCredentials -> return signInResult
+
+            /* If sign-in is successful, check if the user exists */
+            is SignInResult.Success -> {
+                when(val userResult = getUser()) {
+                    /* If the user exists, return the user result */
+                    is SignInResult.Success -> return userResult
+
+                    /* If user doesn't exist in the database, attempt to create or update the user */
+                    SignInResult.Cancelled,
+                    is SignInResult.Failure,
+                    is SignInResult.NoCredentials -> {
+                        /* Create or update the user in the database */
+                        val success = createOrUpdateUser(signInResult.user ?: return SignInResult.Cancelled)
+
+                        /* Return success or failure based on user creation or update outcome */
+                        return if (success) SignInResult.Success(signInResult.user)
+                        else SignInResult.Cancelled
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Opens the Google authentication dialog for the user.
+     *
+     * This function triggers the Google authentication dialog based on the provided client parameters.
+     *
+     * @param googleAuthUiClient Parameters required for the Google authentication UI client.
+     * @return The result of opening the Google authentication dialog.
+     */
+    suspend fun openGoogleAuthDialog(googleAuthUiClient: GoogleAuthUiClientParameters) =
+        googleAuthActionable.openGoogleAuthDialog(googleAuthUiClient)
+
+    /**
      * Logs out the current user by invoking the logout functionality in [authActionable].
      */
-    fun logOut() = authActionable.logout()
+    fun logOut(){
+        googleAuthActionable.signOut()
+        authActionable.logout()
+    }
 
     /**
      * Initiates a password reset for the user with the provided email.

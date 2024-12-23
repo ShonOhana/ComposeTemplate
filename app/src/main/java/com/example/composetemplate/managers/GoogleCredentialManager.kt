@@ -1,19 +1,10 @@
-package com.plcoding.credentialmanagerguidecompose
+package com.example.composetemplate.managers
 
-import android.app.Activity
-import androidx.credentials.CreatePasswordRequest
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetPasswordOption
-import androidx.credentials.PasswordCredential
-import androidx.credentials.exceptions.CreateCredentialCancellationException
-import androidx.credentials.exceptions.CreateCredentialException
-import androidx.credentials.exceptions.GetCredentialCancellationException
-import androidx.credentials.exceptions.GetCredentialException
-import androidx.credentials.exceptions.NoCredentialException
-import com.example.composetemplate.data.models.local_models.User
+import com.example.composetemplate.R
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
 
 
+// TODO: this is in development. dont delete but dont use yet
 sealed interface GoogleAuth {
 //    suspend fun googleSignUp(activity: Activity,user: User,password: String, loginCallback: LoginCallback)
 //    suspend fun googleSignIn(activity: Activity,successCallback: SuccessCallback)
@@ -74,5 +65,6 @@ class GoogleCredentialManager : GoogleAuth {
 //            e.printStackTrace()
 //            successCallback(false,e)
 //        }
-//    }
+//    }\
+
 }

@@ -1,13 +1,12 @@
 package com.example.composetemplate.repositories
 
-import com.example.composetemplate.data.models.local_models.ErrorType
+import com.example.composetemplate.data.models.local_models.GoogleAuthUiClientParameters
 import com.example.composetemplate.data.models.local_models.LoginParameterizable
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.models.server_models.PermissionType
-import com.example.composetemplate.data.remote.errors.AuthError
 import com.example.composetemplate.presentation.screens.entry_screens.login.LoginResults
-import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignInResult
 
 
 /**
@@ -47,19 +46,21 @@ class AuthInteractor(
     suspend fun login(loginProvider: LoginProvider, loginParams: LoginParameterizable): LoginResults {
         return when (loginProvider) {
             LoginProvider.REGISTER_WITH_EMAIL_AND_PASSWORD -> {
-                val email = (loginParams as? NonSocialLoginParameter)?.email.orEmpty()
-                val password = loginParams.password
+                val params = (loginParams as? NonSocialLoginParameter) ?: return SignInResult.Cancelled
+                val email = params.email
+                val password = params.password
                 val user = User(
                     email = email,
-                    fullName = loginParams.fullName,
+                    fullName = params.fullName,
                     permissionType = PermissionType.DEVELOPER.name.lowercase()
                 )
                 loginRepository.registerUser(user, password)
             }
 
             LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD -> {
-                val email = (loginParams as? NonSocialLoginParameter)?.email.orEmpty()
-                val password = loginParams.password
+                val params = (loginParams as? NonSocialLoginParameter) ?: return SignInResult.Cancelled
+                val email = params.email
+                val password = params.password
                 val user = User(
                     email = email,
                     fullName = "",
@@ -67,15 +68,14 @@ class AuthInteractor(
                 )
                 loginRepository.signInEmailPasswordUser(user, password)
             }
-
-            // Uncomment and implement when adding support for Google Sign-In.
-            // LoginProvider.GOOGLE_SIGN_IN -> {
-            //     loginRepository.signInWithGoogle(loginCallback)
-            // }
-
-            else -> SignUpResult.Failure(AuthError(ErrorType.UNKNOWN_ERROR))
+             LoginProvider.GOOGLE_SIGN_IN -> {
+                 val params = (loginParams as? GoogleAuthUiClientParameters) ?: return SignInResult.Cancelled
+                 loginRepository.signInWithIntent(params.intent)
+             }
         }
     }
+
+    suspend fun openGoogleAuthDialog(googleAuthUiClient: GoogleAuthUiClientParameters) = loginRepository.openGoogleAuthDialog(googleAuthUiClient)
 
     /**
      * Retrieves the currently authenticated user from the repository.
@@ -95,11 +95,5 @@ class AuthInteractor(
      * @param email The email address to reset the password for.
      */
     suspend fun resetPassword(email: String) = loginRepository.resetPassword(email)
-
-
-    //testtttt
-//    suspend fun signUp(username: String, password: String) = accountManager.signUp(username, password)
-//
-//    suspend fun signIn() = accountManager.signIn()
 
 }

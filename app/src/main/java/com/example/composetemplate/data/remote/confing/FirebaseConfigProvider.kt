@@ -29,6 +29,7 @@ object FirebaseConfigProvider {
         /* String Files */
         STRING_EN,
         STRING_HE,
+        WEB_CLIENT_ID
     }
 
     inline fun <reified T> getData(key: RemoteConfigValues): T {

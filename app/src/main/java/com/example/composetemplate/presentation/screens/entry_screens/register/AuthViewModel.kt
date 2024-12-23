@@ -1,10 +1,12 @@
 package com.example.composetemplate.presentation.screens.entry_screens.register
 
+import android.content.IntentSender
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.example.composetemplate.base.BaseViewModel
+import com.example.composetemplate.data.models.local_models.GoogleAuthUiClientParameters
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
@@ -100,6 +102,34 @@ class AuthViewModel(
             }
         }
     }
+
+    /**
+     * Signs in a user with their Google account.
+     *
+     * @param googleAuthUiClient The parameters required for Google Sign-In authentication.
+     */
+    fun signInWithGoogle(googleAuthUiClient: GoogleAuthUiClientParameters) {
+        viewModelScope.launch {
+            val result = authInteractor.login(LoginProvider.GOOGLE_SIGN_IN, googleAuthUiClient) as? SignInResult ?: return@launch
+            when (result) {
+                SignInResult.Cancelled -> setSignInResultState(result, AuthScreenState.Login, null, null)
+                is SignInResult.Failure -> setSignInResultState(result, AuthScreenState.Login, result.errorable?.errorType?.messageKey, null)
+                is SignInResult.NoCredentials -> setSignInResultState(result, AuthScreenState.Login, result.errorable?.errorType?.messageKey, null)
+                is SignInResult.Success -> setSignInResultState(result, null, null, result.user)
+            }
+        }
+    }
+
+    /**
+     * Creates an IntentSender for Google Sign-In.
+     *
+     * This function generates an `IntentSender` to facilitate the Google Sign-In process and open auth dialog.
+     *
+     * @param googleAuthUiClient The parameters required for Google Sign-In.
+     * @return The `IntentSender` object used for launching the Google Sign-In UI.
+     */
+    suspend fun openGoogleAuthDialog(googleAuthUiClient: GoogleAuthUiClientParameters) =
+        authInteractor.openGoogleAuthDialog(googleAuthUiClient)
 
     /**
      * Logs out the current user.
@@ -216,6 +246,4 @@ class AuthViewModel(
             AuthScreenState.Register -> signupData.authError = errorMessageKey
         }
     }
-
-    //    suspend fun signUp() = authInteractor.signUp("Shon","123456")
 }

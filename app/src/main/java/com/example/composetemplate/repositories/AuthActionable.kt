@@ -1,5 +1,8 @@
 package com.example.composetemplate.repositories
 
+import android.content.Intent
+import android.content.IntentSender
+import com.example.composetemplate.data.models.local_models.GoogleAuthUiClientParameters
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignInResult
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
@@ -16,4 +19,10 @@ sealed interface AuthActionable {
     suspend fun getUser() : SignInResult
     suspend fun resetPassword(email: String)
     fun logout()
+}
+
+sealed interface GoogleAuthActionable {
+    suspend fun signInWithIntent(intent: Intent?): SignInResult
+    suspend fun openGoogleAuthDialog(googleAuthUiClient: GoogleAuthUiClientParameters): IntentSender?
+    fun signOut()
 }
