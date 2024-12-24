@@ -1,3 +1,7 @@
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +36,6 @@ fun AuthScreen(
     navigator: Navigator,
     authViewModel: AuthViewModel = koinViewModel(),
     layoutDirection: LayoutDirection = LayoutDirection.Ltr
-
 ) {
     val focusManager = LocalFocusManager.current
     var currentScreen by remember { mutableStateOf(AuthScreenState.Login) }
@@ -45,34 +48,50 @@ fun AuthScreen(
                 .imePadding()
                 .pointerInput(Unit) {
                     detectTapGestures {
-                        focusManager.clearFocus()
+                        focusManager.clearFocus() // Clear focus to close the keyboard
                     }
                 },
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             FullScreenProgressBar(authViewModel.isProgressVisible)
-            LoginPageHeader()
-            when (currentScreen) {
-                AuthScreenState.Login -> LoginScreen(
-                    viewModel = authViewModel,
-                    onRegisterClicked = { currentScreen = AuthScreenState.Register },
-                    isLoginSucceed = { success, exception ->
-                        if (success && exception == null)
-                            navigator.navigate(MainScreens.Lectures)
-                    },
-                )
-
-                AuthScreenState.Register -> RegisterScreen(
-                    viewModel = authViewModel,
-                    onLoginClicked = { currentScreen = AuthScreenState.Login },
-                    isRegisterSucceed = { success, exception ->
-                        if (success && exception == null)
-                            navigator.navigate(MainScreens.Lectures)
-                    },
-                )
-            }
-
+            LoginPageHeader(authViewModel = authViewModel)
+            AnimatedContent(
+                targetState = currentScreen == AuthScreenState.Login,
+                modifier = Modifier.fillMaxSize(),
+                content = { isVisible ->
+                    if (isVisible) {
+                        LoginScreen(
+                            viewModel = authViewModel,
+                            onRegisterClicked = { currentScreen = AuthScreenState.Register },
+                            isLoginSucceed = { success ->
+                                if (success)
+                                    navigator.navigate(MainScreens.Lectures)
+                            },
+                        )
+                    } else {
+                        RegisterScreen(
+                            viewModel = authViewModel,
+                            onLoginClicked = { currentScreen = AuthScreenState.Login },
+                            isRegisterSucceed = { success ->
+                                if (success)
+                                    navigator.navigate(MainScreens.Lectures)
+                            },
+                        )
+                    }
+                },
+                transitionSpec = {
+                    slideInHorizontally(
+                        initialOffsetX = {
+                            if (currentScreen == AuthScreenState.Login) it else -it
+                        }
+                    ) togetherWith slideOutHorizontally(
+                        targetOffsetX = {
+                            if (currentScreen == AuthScreenState.Login) it else it
+                        }
+                    )
+                }, label = ""
+            )
         }
     }
 }

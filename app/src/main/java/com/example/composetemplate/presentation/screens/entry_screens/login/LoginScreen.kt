@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.composetemplate.R
+import com.example.composetemplate.managers.StringsKeyManager.DONT_HAVE_ACCOUNT_TEXT
 import com.example.composetemplate.presentation.common.BaseNativeDialog
 import com.example.composetemplate.presentation.common.LoginScreenButton
 import com.example.composetemplate.presentation.common.LoginTextField
@@ -44,11 +45,12 @@ import com.example.composetemplate.presentation.screens.entry_screens.register.A
 import com.example.composetemplate.presentation.screens.entry_screens.register.registerFields
 import com.example.composetemplate.ui.theme.CustomTheme
 import com.example.composetemplate.utils.Constants
+import com.example.composetemplate.utils.Constants.Companion.AUTHENTICATION_ERROR_TEXT
 import com.example.composetemplate.utils.Constants.Companion.FORGOT_PASSWORD_BUTTON_TEXT
 import com.example.composetemplate.utils.Constants.Companion.FORGOT_PASSWORD_TITLE
 import com.example.composetemplate.utils.Constants.Companion.LOGIN_TEXT
 import com.example.composetemplate.utils.Constants.Companion.UNKNOWN_EXCEPTION
-import com.example.composetemplate.utils.SuccessCallback
+import com.example.composetemplate.utils.StringProvider
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.util.logging.ErrorManager
@@ -63,20 +65,32 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel,
     onRegisterClicked: () -> Unit,
-    isLoginSucceed: SuccessCallback,
+    isLoginSucceed: (Boolean) -> Unit,
 ) {
+    val signInResult by viewModel.signInResult.collectAsState()
+    LaunchedEffect(signInResult) {
+        signInResult?.let { result ->
+            when(result) {
+                SignInResult.Cancelled,
+                is SignInResult.Failure,
+                is SignInResult.NoCredentials -> isLoginSucceed(false)
+                is SignInResult.Success -> isLoginSucceed(true)
+            }
+        }
+    }
     val errorMessage = viewModel.signInData.authError
     val keyboardController = LocalSoftwareKeyboardController.current
-    val scope = rememberCoroutineScope()
 
     val focusRequestList = remember {
         List(loginFields.size) { FocusRequester() }
     }
-    // Request focus on the first TextField when the composable is launched
-    LaunchedEffect(Unit) {
-        focusRequestList.first().requestFocus()
-        keyboardController?.show()
-    }
+
+    /* MARK: uncomment if you want focus request and not animation */
+//    // Request focus on the first TextField when the composable is launched
+//    LaunchedEffect(Unit) {
+//        focusRequestList.first().requestFocus()
+//        keyboardController?.show()
+//    }
 
     Box(
         modifier = modifier
@@ -103,7 +117,8 @@ fun LoginScreen(
                     for (index in loginFields.indices) {
                         val loginField = loginFields[index]
                         LoginTextField(
-                            modifier = Modifier.padding(horizontal = 24.dp)
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp)
                                 .focusRequester(focusRequestList[index]),
                             text = viewModel.setText(loginField, AuthScreenState.Login),
                             loginScreenEnum = loginField,
@@ -122,8 +137,9 @@ fun LoginScreen(
                             },
                             onDoneClick = {
                                 val isValid = viewModel.signInData.isValidLoginPage
-                                if (isValid)
-                                    viewModel.signInEmailAndPassword(isLoginSucceed)
+                                if (isValid) {
+                                    viewModel.signInEmailAndPassword()
+                                }
                                 keyboardController?.hide()
                             }
                         )
@@ -134,7 +150,7 @@ fun LoginScreen(
                             .graphicsLayer {
                                 alpha = if (errorMessage != null) 1f else 0f
                             },
-                        text = errorMessage ?: UNKNOWN_EXCEPTION,
+                        text = StringProvider.getString(errorMessage ?: UNKNOWN_EXCEPTION,) ?: UNKNOWN_EXCEPTION,
                         color = CustomTheme.colors.error,
                         style = MaterialTheme.typography.labelMedium,
                         textAlign = TextAlign.Center
@@ -144,12 +160,10 @@ fun LoginScreen(
                             .padding(top = 12.dp)
                             .padding(horizontal = 24.dp),
                         isEnabled = viewModel.signInData.isValidLoginPage,
-                        text = LOGIN_TEXT
+                        text = StringProvider.getString(LOGIN_TEXT),
                     ) {
-                        scope.launch {
-                            keyboardController?.hide()
-                            viewModel.signInEmailAndPassword(isLoginSucceed)
-                        }
+                        keyboardController?.hide()
+                        viewModel.signInEmailAndPassword()
                     }
                     Text(
                         modifier = Modifier

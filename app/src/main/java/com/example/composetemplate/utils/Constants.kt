@@ -3,8 +3,6 @@ package com.example.composetemplate.utils
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.repositories.AuthInteractor
 
-typealias LoginCallback = (User?, Exception?) -> Unit
-typealias SuccessCallback = (Boolean, Exception?) -> Unit
 typealias LoginProvider = AuthInteractor.LoginProvider
 class Constants {
 
