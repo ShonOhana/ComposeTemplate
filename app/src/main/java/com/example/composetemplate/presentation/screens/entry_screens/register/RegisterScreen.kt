@@ -74,11 +74,13 @@ fun RegisterScreen(
     val focusRequestList = remember {
         List(registerFields.size) { FocusRequester() }
     }
-    // Request focus on the first TextField when the composable is launched
-    LaunchedEffect(Unit) {
-        focusRequestList.first().requestFocus()
-        keyboardController?.show()
-    }
+
+    /* MARK: uncomment if you want focus request and not animation */
+//    // Request focus on the first TextField when the composable is launched
+//    LaunchedEffect(Unit) {
+//        focusRequestList.first().requestFocus()
+//        keyboardController?.show()
+//    }
     LazyColumn(
         modifier = modifier
             .fillMaxSize()

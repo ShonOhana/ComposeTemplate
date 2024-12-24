@@ -42,7 +42,7 @@ fun LoginTextField(
     onNextFocusRequest: (() -> Unit)? = null,
     onDoneClick: (() -> Unit)? = null
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
+//    val keyboardController = LocalSoftwareKeyboardController.current
     var isFocused by remember { mutableStateOf(false) }
     OutlinedTextField(
         modifier = modifier
@@ -92,10 +92,13 @@ fun LoginTextField(
         )
     Spacer(modifier = modifier.height(12.dp))
 
-    if (isFirstEditText) {
-        LaunchedEffect(Unit) {
-            focusRequester?.requestFocus()
-            keyboardController?.show()
-        }
-    }
+    /* MARK: uncomment if you want focus request and not animation */
+    /* Automatically request focus and show the keyboard */
+
+//    if (isFirstEditText) {
+//        LaunchedEffect(Unit) {
+//            focusRequester?.requestFocus()
+//            keyboardController?.show()
+//        }
+//    }
 }

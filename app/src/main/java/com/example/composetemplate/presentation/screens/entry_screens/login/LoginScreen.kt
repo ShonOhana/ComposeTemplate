@@ -84,11 +84,13 @@ fun LoginScreen(
     val focusRequestList = remember {
         List(loginFields.size) { FocusRequester() }
     }
-    // Request focus on the first TextField when the composable is launched
-    LaunchedEffect(Unit) {
-        focusRequestList.first().requestFocus()
-        keyboardController?.show()
-    }
+
+    /* MARK: uncomment if you want focus request and not animation */
+//    // Request focus on the first TextField when the composable is launched
+//    LaunchedEffect(Unit) {
+//        focusRequestList.first().requestFocus()
+//        keyboardController?.show()
+//    }
 
     Box(
         modifier = modifier
