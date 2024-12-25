@@ -17,6 +17,8 @@ val DarkBlue222325 = Color(0xFF222325)
 val Gray37383A = Color(0xFF37383A)
 val Gray67 = Color(0xABFFFFFF)
 val LightBlue01B3BD = Color(0xFF01B3BD)
+val LightGray = Color(0xFFDAD2D2)
+val BlackAlpha50 = Color(0x80000000)
 
 /**
  * The Immutable annotation is used for optimization. For more information,
@@ -39,7 +41,9 @@ data class CustomColorsPalette(
     val circleImageBorder: Color = White,
     val nativeDialogBackground: Color = White,
     val progress: Color = White,
+    val bottomSheetScrimColor: Color = BlackAlpha50,
     val title: Color = Color.Unspecified,
     val cursor: Color = Color.Unspecified,
     val dialogText: Color = Color.Black,
+    val bottomSheetDialogBackground: Color = LightGray,
 )
