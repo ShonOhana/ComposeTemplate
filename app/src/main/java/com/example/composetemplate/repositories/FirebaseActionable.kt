@@ -1,10 +1,13 @@
 package com.example.composetemplate.repositories
 
-import android.content.Intent
-import android.content.IntentSender
 import android.util.Base64
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
 import com.example.composetemplate.data.models.local_models.ErrorType
-import com.example.composetemplate.data.models.local_models.GoogleAuthUiClientParameters
+import com.example.composetemplate.data.models.local_models.GoogleCredentialAuthParameter
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.models.server_models.PermissionType
 import com.example.composetemplate.data.remote.confing.FirebaseConfigProvider
@@ -15,14 +18,16 @@ import com.example.composetemplate.managers.TokenFetcher
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignInResult
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
 import com.example.composetemplate.utils.extensions.errorType
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import org.json.JSONObject
-import kotlin.coroutines.cancellation.CancellationException
+import java.security.MessageDigest
+import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -31,11 +36,9 @@ import kotlin.coroutines.resumeWithException
  * It manages user sign-up, sign-in, password reset, and token fetching using Firebase Authentication SDK.
  * This class also implements TokenFetcher to retrieve and manage the Firebase token.
  */
-class FirebaseActionable : AuthActionable,GoogleAuthActionable, TokenFetcher {
+class FirebaseActionable : AuthActionable, TokenFetcher {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    lateinit var oneTapClient: SignInClient
-
 
     /**
      * Registers a new user using email and password.
@@ -173,24 +176,47 @@ class FirebaseActionable : AuthActionable,GoogleAuthActionable, TokenFetcher {
     }
 
     /**
-     * Signs in the user using an intent received from the Google One Tap client.
+     * Performs Google Sign-In using Google Identity Services and Firebase.
      *
-     * This method retrieves the Google Sign-In credential from the provided intent,
-     * extracts the ID token, and uses it to authenticate the user via Firebase.
-     *
-     * @param intent The intent received from the Google One Tap client.
-     * @return A [SignInResult] object that represents the outcome of the sign-in operation.
-     * - [SignInResult.Success]: Contains the user details if the sign-in is successful.
-     * - [SignInResult.Cancelled]: Returned if an error occurs during the sign-in process or if the intent is null.
-     * @throws CancellationException If the coroutine is canceled during the operation.
+     * @param googleCredentialAuthParameter Parameters needed for Google Sign-In, including the activity context.
+     * @return A [SignInResult] indicating the outcome of the sign-in operation.
      */
-    override suspend fun signInWithIntent(intent: Intent?): SignInResult {
-        if (::oneTapClient.isInitialized.not()) return SignInResult.Cancelled
-        val credential = oneTapClient.getSignInCredentialFromIntent(intent)
-        val googleIdToken = credential.googleIdToken
-        val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
+    override suspend fun googleSignIn(googleCredentialAuthParameter: GoogleCredentialAuthParameter): SignInResult {
         return try {
+            val credentialManager = CredentialManager.create(googleCredentialAuthParameter.activity)
+
+            /* Generate a random nonce for security purposes. */
+            val rawNonce = UUID.randomUUID().toString()
+            val bytes = rawNonce.toByteArray()
+
+            /* Hash the nonce using SHA-256 for additional security. */
+            val md = MessageDigest.getInstance("SHA-256")
+            val digest = md.digest(bytes)
+            val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
+
+            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(FirebaseConfigProvider.getData(remoteConfigVal.WEB_CLIENT_ID))
+                .setNonce(hashedNonce)
+                .build()
+
+            val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
+
+            val result = credentialManager.getCredential(
+                request = request,
+                context = googleCredentialAuthParameter.activity
+            )
+            val credential = result.credential
+
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            val googleIdToken = googleIdTokenCredential.idToken
+
+            /* Create Firebase credentials using the Google ID token. */
+            val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
             val user = auth.signInWithCredential(googleCredentials).await().user
+
             SignInResult.Success(
                 User(
                     fullName = user?.displayName ?: "",
@@ -198,66 +224,15 @@ class FirebaseActionable : AuthActionable,GoogleAuthActionable, TokenFetcher {
                     permissionType = PermissionType.DEVELOPER.name.lowercase()
                 )
             )
-        } catch(e: Exception) {
+        } catch (e: GetCredentialCancellationException) {
             e.printStackTrace()
-            if(e is CancellationException) throw e
             SignInResult.Cancelled
-        }
-    }
-
-    /**
-     * Opens the Google Authentication dialog using the provided One Tap client parameters.
-     *
-     * This method initializes the Google One Tap client and starts the sign-in process,
-     * returning an [IntentSender] for launching the authentication UI.
-     *
-     * @param googleAuthUiClient The parameters required to initialize the Google One Tap client.
-     * @return An [IntentSender] that can be used to launch the authentication dialog, or `null` if an error occurs.
-     * @throws CancellationException If the coroutine is canceled during the operation.
-     */
-    override suspend fun openGoogleAuthDialog(googleAuthUiClient: GoogleAuthUiClientParameters): IntentSender? {
-        val result = try {
-            oneTapClient = googleAuthUiClient.oneTapClient
-            oneTapClient.beginSignIn(
-                buildSignInRequest()
-            ).await()
-        } catch(e: Exception) {
+        } catch (e: NoCredentialException) {
             e.printStackTrace()
-            if(e is CancellationException) throw e
-            null
+            SignInResult.NoCredentials(AuthError(e.errorType))
+        } catch (e: GetCredentialException) {
+            e.printStackTrace()
+            SignInResult.Failure(AuthError(e.errorType))
         }
-        return result?.pendingIntent?.intentSender
     }
-
-    /**
-     * Builds a [BeginSignInRequest] for Google One Tap authentication.
-     *
-     * This request specifies the configuration for ID token retrieval and authorized accounts.
-     *
-     * @return A [BeginSignInRequest] object containing the sign-in options.
-     */
-    private fun buildSignInRequest(): BeginSignInRequest {
-        return BeginSignInRequest.Builder()
-            .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(FirebaseConfigProvider.getData(remoteConfigVal.WEB_CLIENT_ID))
-                    .build()
-            )
-            .setAutoSelectEnabled(true)
-            .build()
-    }
-
-    /**
-     * Signs out the current user from the Google One Tap client.
-     *
-     * This method clears the current user session for the Google One Tap client.
-     * If the client is not initialized, the method returns immediately.
-     */
-    override fun signOut() {
-        if (::oneTapClient.isInitialized.not()) return
-        oneTapClient.signOut()
-    }
-
 }

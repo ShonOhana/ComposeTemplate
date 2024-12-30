@@ -1,8 +1,7 @@
 package com.example.composetemplate.repositories
 
-import android.content.Intent
 import com.example.composetemplate.data.local.CacheData.user
-import com.example.composetemplate.data.models.local_models.GoogleAuthUiClientParameters
+import com.example.composetemplate.data.models.local_models.GoogleCredentialAuthParameter
 import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.data.remote.base.BaseRequest
 import com.example.composetemplate.data.remote.errors.AuthError
@@ -32,7 +31,6 @@ interface AuthDbServiceable {
  */
 class LoginRepository(
     private val authActionable: AuthActionable,
-    private val googleAuthActionable: GoogleAuthActionable,
     private val networkManager: MainNetworkManager
 ) : AuthDbServiceable {
 
@@ -76,18 +74,13 @@ class LoginRepository(
     suspend fun signInEmailPasswordUser(user: User, password: String) = authActionable.signInWithEmailAndPassword(user, password)
 
     /**
-     * Signs in a user with the provided intent from Google authentication.
+     * Handles the Google Sign-In process and subsequent user management in the database.
      *
-     * This function handles the Google sign-in process. If the sign-in is successful, it checks if
-     * the user already exists in the database. If the user does not exist, it creates or updates the user.
-     * It ensures that no unnecessary server call is made if the user already exists.
-     *
-     * @param intent The intent containing Google sign-in data.
-     * @return The result of the sign-in attempt, either successful or failure.
+     * @param googleCredentialAuthParameter Parameters required for Google Sign-In.
+     * @return A [SignInResult] indicating the outcome of the sign-in and user management process.
      */
-    suspend fun signInWithIntent(intent: Intent?): SignInResult {
-        /* Attempt to sign in with the provided intent */
-        when(val signInResult = googleAuthActionable.signInWithIntent(intent)) {
+    suspend fun googleSignIn(googleCredentialAuthParameter: GoogleCredentialAuthParameter): SignInResult {
+        when (val signInResult = authActionable.googleSignIn(googleCredentialAuthParameter)) {
             /* If the sign-in is cancelled, failed, or has no credentials, return that result */
             SignInResult.Cancelled,
             is SignInResult.Failure,
@@ -95,7 +88,7 @@ class LoginRepository(
 
             /* If sign-in is successful, check if the user exists */
             is SignInResult.Success -> {
-                when(val userResult = getUser()) {
+                when (val userResult = getUser()) {
                     /* If the user exists, return the user result */
                     is SignInResult.Success -> return userResult
 
@@ -104,7 +97,8 @@ class LoginRepository(
                     is SignInResult.Failure,
                     is SignInResult.NoCredentials -> {
                         /* Create or update the user in the database */
-                        val success = createOrUpdateUser(signInResult.user ?: return SignInResult.Cancelled)
+                        val success =
+                            createOrUpdateUser(signInResult.user ?: return SignInResult.Cancelled)
 
                         /* Return success or failure based on user creation or update outcome */
                         return if (success) SignInResult.Success(signInResult.user)
@@ -116,23 +110,9 @@ class LoginRepository(
     }
 
     /**
-     * Opens the Google authentication dialog for the user.
-     *
-     * This function triggers the Google authentication dialog based on the provided client parameters.
-     *
-     * @param googleAuthUiClient Parameters required for the Google authentication UI client.
-     * @return The result of opening the Google authentication dialog.
-     */
-    suspend fun openGoogleAuthDialog(googleAuthUiClient: GoogleAuthUiClientParameters) =
-        googleAuthActionable.openGoogleAuthDialog(googleAuthUiClient)
-
-    /**
      * Logs out the current user by invoking the logout functionality in [authActionable].
      */
-    fun logOut(){
-        googleAuthActionable.signOut()
-        authActionable.logout()
-    }
+    fun logOut() = authActionable.logout()
 
     /**
      * Initiates a password reset for the user with the provided email.

@@ -1,9 +1,6 @@
 package com.example.composetemplate.data.models.local_models
 
-import android.content.Context
-import android.content.Intent
-import com.google.android.gms.auth.api.identity.SignInClient
-
+import android.app.Activity
 
 /**
  * This File is for sending params according to each auth type
@@ -26,8 +23,6 @@ data class NonSocialLoginParameter(
     val fullName: String = ""
 ): LoginParameterizable
 
-data class GoogleAuthUiClientParameters(
-    val context: Context,
-    val oneTapClient: SignInClient,
-    var intent: Intent? = null
+data class GoogleCredentialAuthParameter(
+    val activity: Activity
 ): LoginParameterizable

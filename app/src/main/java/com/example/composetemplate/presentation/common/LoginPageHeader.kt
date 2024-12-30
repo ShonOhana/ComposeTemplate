@@ -1,9 +1,6 @@
 package com.example.composetemplate.presentation.common
 
-import android.app.Activity.RESULT_OK
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,11 +23,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.composetemplate.R
-import com.example.composetemplate.data.models.local_models.GoogleAuthUiClientParameters
+import com.example.composetemplate.data.models.local_models.GoogleCredentialAuthParameter
 import com.example.composetemplate.ui.theme.CustomTheme
 import com.example.composetemplate.utils.Constants.Companion.AUTH_WITH_GOOGLE
 import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
-import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
 @Composable
@@ -38,22 +34,8 @@ fun LoginPageHeader(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
 ) {
-    val context = LocalContext.current
+    val activity = LocalContext.current as Activity
     val scope = rememberCoroutineScope()
-
-    /* Google log in */
-    val googleAuthUiClient = GoogleAuthUiClientParameters(context,
-        Identity.getSignInClient(context))
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartIntentSenderForResult(),
-        onResult = { result ->
-            if(result.resultCode == RESULT_OK) {
-                googleAuthUiClient.intent = result.data
-                authViewModel.signInWithGoogle(googleAuthUiClient)
-            }
-        }
-    )
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,19 +66,10 @@ fun LoginPageHeader(
                     .size(55.dp)
                     .clickable {
                         scope.launch {
-                            val signInIntentSender =
-                                authViewModel.openGoogleAuthDialog(googleAuthUiClient)
-                            launcher.launch(
-                                IntentSenderRequest
-                                    .Builder(
-                                        signInIntentSender ?: return@launch
-                                    )
-                                    .build()
-                            )
+                            authViewModel.signInWithGoogle(GoogleCredentialAuthParameter(activity))
                         }
                     }
             )
-
             Text(
                 modifier = modifier
                     .padding(top = 6.dp),

@@ -1,6 +1,6 @@
 package com.example.composetemplate.repositories
 
-import com.example.composetemplate.data.models.local_models.GoogleAuthUiClientParameters
+import com.example.composetemplate.data.models.local_models.GoogleCredentialAuthParameter
 import com.example.composetemplate.data.models.local_models.LoginParameterizable
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
 import com.example.composetemplate.data.models.local_models.User
@@ -69,13 +69,11 @@ class AuthInteractor(
                 loginRepository.signInEmailPasswordUser(user, password)
             }
              LoginProvider.GOOGLE_SIGN_IN -> {
-                 val params = (loginParams as? GoogleAuthUiClientParameters) ?: return SignInResult.Cancelled
-                 loginRepository.signInWithIntent(params.intent)
+                 val params = (loginParams as? GoogleCredentialAuthParameter) ?: return SignInResult.Cancelled
+                 loginRepository.googleSignIn(params)
              }
         }
     }
-
-    suspend fun openGoogleAuthDialog(googleAuthUiClient: GoogleAuthUiClientParameters) = loginRepository.openGoogleAuthDialog(googleAuthUiClient)
 
     /**
      * Retrieves the currently authenticated user from the repository.

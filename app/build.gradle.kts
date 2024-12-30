@@ -131,4 +131,6 @@ dependencies {
     /* Google */
     implementation(libs.androidx.credentials.core)
     implementation(libs.androidx.credentials.compat)
+    implementation(libs.androidx.credentials.play.services.auth.v150beta01)
+    implementation(libs.googleid)
 }
