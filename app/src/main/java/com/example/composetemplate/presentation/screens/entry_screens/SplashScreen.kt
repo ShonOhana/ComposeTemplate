@@ -24,8 +24,7 @@ fun SplashScreen(
     val userState by authViewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
         authViewModel.fetchUserData(null)
-        val fiveSeconds = 3000L
-        delay(fiveSeconds)
+        delay(3000L)
         // parameter to pass data for example
         val isUserAuthorized = false
         val shouldShowAdd = true

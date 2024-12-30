@@ -18,7 +18,6 @@ import com.example.composetemplate.managers.TokenFetcher
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignInResult
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
 import com.example.composetemplate.utils.extensions.errorType
-import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
@@ -36,7 +35,7 @@ import kotlin.coroutines.resumeWithException
  * It manages user sign-up, sign-in, password reset, and token fetching using Firebase Authentication SDK.
  * This class also implements TokenFetcher to retrieve and manage the Firebase token.
  */
-class FirebaseActionable : AuthActionable, TokenFetcher {
+class FirebaseAuthManager : AuthActionable, TokenFetcher {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
@@ -184,34 +183,9 @@ class FirebaseActionable : AuthActionable, TokenFetcher {
     override suspend fun googleSignIn(googleCredentialAuthParameter: GoogleCredentialAuthParameter): SignInResult {
         return try {
             val credentialManager = CredentialManager.create(googleCredentialAuthParameter.activity)
-
-            /* Generate a random nonce for security purposes. */
-            val rawNonce = UUID.randomUUID().toString()
-            val bytes = rawNonce.toByteArray()
-
-            /* Hash the nonce using SHA-256 for additional security. */
-            val md = MessageDigest.getInstance("SHA-256")
-            val digest = md.digest(bytes)
-            val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
-
-            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(FirebaseConfigProvider.getData(remoteConfigVal.WEB_CLIENT_ID))
-                .setNonce(hashedNonce)
-                .build()
-
-            val request: GetCredentialRequest = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build()
-
-            val result = credentialManager.getCredential(
-                request = request,
-                context = googleCredentialAuthParameter.activity
-            )
-            val credential = result.credential
-
-            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-            val googleIdToken = googleIdTokenCredential.idToken
+            val googleIdOption: GetGoogleIdOption = creacteGoogleIdOptionWithSecurity()
+            val request: GetCredentialRequest = createGoogleSignInRequest(googleIdOption)
+            val googleIdToken = getGoogleIdTokenFromCredentialManager(credentialManager, request, googleCredentialAuthParameter)
 
             /* Create Firebase credentials using the Google ID token. */
             val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
@@ -234,5 +208,46 @@ class FirebaseActionable : AuthActionable, TokenFetcher {
             e.printStackTrace()
             SignInResult.Failure(AuthError(e.errorType))
         }
+    }
+
+    private suspend fun getGoogleIdTokenFromCredentialManager(
+        credentialManager: CredentialManager,
+        request: GetCredentialRequest,
+        googleCredentialAuthParameter: GoogleCredentialAuthParameter
+    ): String {
+        val result = credentialManager.getCredential(
+            request = request,
+            context = googleCredentialAuthParameter.activity
+        )
+        val credential = result.credential
+
+        val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+        val googleIdToken = googleIdTokenCredential.idToken
+        return googleIdToken
+    }
+
+    private fun createGoogleSignInRequest(googleIdOption: GetGoogleIdOption): GetCredentialRequest {
+        val request: GetCredentialRequest = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+        return request
+    }
+
+    private fun creacteGoogleIdOptionWithSecurity(): GetGoogleIdOption {
+        /* Generate a random nonce for security purposes. */
+        val rawNonce = UUID.randomUUID().toString()
+        val bytes = rawNonce.toByteArray()
+
+        /* Hash the nonce using SHA-256 for additional security. */
+        val md = MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
+
+        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId(FirebaseConfigProvider.getData(remoteConfigVal.WEB_CLIENT_ID))
+            .setNonce(hashedNonce)
+            .build()
+        return googleIdOption
     }
 }
