@@ -183,7 +183,7 @@ class LoginRepository(
         user: User?
     ): BaseRequest? {
         return when (authActionable) {
-            is FirebaseActionable -> {
+            is FirebaseAuthManager -> {
                 when (requestType) {
                     RequestType.CREATE_USER -> {
                         if (user == null) return null
