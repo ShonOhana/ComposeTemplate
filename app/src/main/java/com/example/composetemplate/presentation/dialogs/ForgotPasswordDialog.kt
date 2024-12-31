@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +28,7 @@ import com.example.composetemplate.presentation.screens.entry_screens.register.A
 import com.example.composetemplate.utils.Constants.Companion.FORGOT_PASSWORD_BUTTON_TEXT
 import com.example.composetemplate.utils.Constants.Companion.FORGOT_PASSWORD_TITLE
 import com.example.composetemplate.utils.extensions.isValidEmail
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -34,6 +36,7 @@ fun ForgotPasswordDialog(
     viewModel: AuthViewModel
 ) {
     if (viewModel.isDialogVisible) {
+        val scope = rememberCoroutineScope()
         BaseNativeDialog(
             modifier = Modifier,
             onDismissRequest = { viewModel.setDialogVisibility(false) }) {
@@ -89,8 +92,10 @@ fun ForgotPasswordDialog(
                         if (!viewModel.forgotPasswordMail.isValidEmail()) {
                             return@LoginScreenButton
                         }
-                        viewModel.resetPassword(viewModel.forgotPasswordMail)
-                        viewModel.setDialogVisibility(false)
+                        scope.launch {
+                            viewModel.setDialogVisibility(false)
+                            viewModel.resetPassword(viewModel.forgotPasswordMail)
+                        }
                     },
                     isEnabled = true,
                     modifier = Modifier

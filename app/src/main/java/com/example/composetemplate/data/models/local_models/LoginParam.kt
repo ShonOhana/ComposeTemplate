@@ -1,5 +1,6 @@
 package com.example.composetemplate.data.models.local_models
 
+import android.app.Activity
 
 /**
  * This File is for sending params according to each auth type
@@ -14,14 +15,14 @@ package com.example.composetemplate.data.models.local_models
  * every data class we will create for parameter need to implement LoginParameterizable
  * to use it in the main login() fun that need to get relevant parameters
  */
-interface LoginParameterizable {
-    val email: String
-    val password: String
-    val fullName: String
-}
+interface LoginParameterizable
 
 data class NonSocialLoginParameter(
-    override val email: String,
-    override val password: String,
-    override val fullName: String = ""
+    val email: String,
+    val password: String,
+    val fullName: String = ""
+): LoginParameterizable
+
+data class GoogleCredentialAuthParameter(
+    val activity: Activity
 ): LoginParameterizable

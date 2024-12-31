@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.example.composetemplate"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.composetemplate"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.firebase.config.ktx)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.measurement.api)
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit.v121)
     androidTestImplementation(libs.androidx.espresso.core.v361)
@@ -124,5 +125,12 @@ dependencies {
 
     implementation(libs.androidx.constraintlayout.compose)
 
+    /* Datetime */
     implementation(libs.kotlinx.datetime)
+
+    /* Google */
+    implementation(libs.androidx.credentials.core)
+    implementation(libs.androidx.credentials.compat)
+    implementation(libs.androidx.credentials.play.services.auth.v150beta01)
+    implementation(libs.googleid)
 }

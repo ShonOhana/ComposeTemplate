@@ -1,11 +1,14 @@
 package com.example.composetemplate.presentation.screens.entry_screens.register
 
+import android.content.IntentSender
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.example.composetemplate.base.BaseViewModel
+import com.example.composetemplate.data.models.local_models.GoogleCredentialAuthParameter
 import com.example.composetemplate.data.models.local_models.NonSocialLoginParameter
+import com.example.composetemplate.data.models.local_models.User
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.CONFIRM_PASSWORD
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.EMAIL
@@ -13,202 +16,220 @@ import com.example.composetemplate.presentation.screens.entry_screens.login.Auth
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthTextFieldsEnum.PASSWORD
 import com.example.composetemplate.presentation.screens.entry_screens.login.AuthScreenState
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignInData
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignInResult
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpData
+import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
 import com.example.composetemplate.repositories.AuthInteractor
-import com.example.composetemplate.utils.LoginCallback
 import com.example.composetemplate.utils.LoginProvider
-import com.example.composetemplate.utils.SuccessCallback
 import com.example.composetemplate.utils.UIState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.logging.ErrorManager
-
 /**
- * NOTE: In this class we use Firebase auth that work with old callback and does not support coroutines.
- * So in our auth functions here is open new coroutine to switch the dispatcher to main thread
- * because I could not use regular suspend fun that call inside vieModelScope because this old callbacks
- * not support coroutines
- * */
+ * ViewModel class responsible for handling authentication-related logic.
+ *
+ * This class interacts with the `AuthInteractor` to perform various authentication operations
+ * such as sign-in, registration, password reset, and user data fetching. Since Firebase authentication
+ * uses old callback-based APIs, coroutines are used to switch the dispatcher to the main thread,
+ * enabling safe and efficient interaction with the UI layer.
+ *
+ * @constructor
+ * @param authInteractor The interactor used to perform authentication-related operations.
+ */
 class AuthViewModel(
     private val authInteractor: AuthInteractor
 ) : BaseViewModel() {
 
-    //authentication data parameters according to loginScreen statement
-    private val _signInData = mutableStateOf(SignInData())
-    val signInData: SignInData by _signInData
-    private val _signupData = mutableStateOf(SignUpData())
-    val signupData: SignUpData by _signupData
-    private val _forgotPasswordMail = mutableStateOf("")
-    val forgotPasswordMail: String by _forgotPasswordMail
+    /** Data used for sign-in operations. */
+    var signInData by mutableStateOf(SignInData())
+        private set
 
-    init {
-        getUser()
+    /** Data used for sign-up operations. */
+    var signupData by mutableStateOf(SignUpData())
+        private set
+
+    /** Stores the email address for the forgot password operation. */
+    var forgotPasswordMail by mutableStateOf("")
+        private set
+
+    /** Holds the result of the sign-in operation. */
+    val signInResult = MutableStateFlow<SignInResult?>(null)
+
+    /**
+     * Fetches user data and updates the authentication state based on the result.
+     *
+     * @param authScreenState The current authentication screen state (Login or Register).
+     */
+    fun fetchUserData(authScreenState: AuthScreenState?) {
+        viewModelScope.launch {
+            when (val result = authInteractor.getUser()) {
+                SignInResult.Cancelled -> setSignInResultState(result, authScreenState, null, null)
+                is SignInResult.Failure -> setSignInResultState(result, authScreenState, result.errorable?.errorType?.messageKey, null)
+                is SignInResult.NoCredentials -> setSignInResultState(result, authScreenState, result.errorable?.errorType?.messageKey, null)
+                is SignInResult.Success -> setSignInResultState(result, authScreenState, null, result.user)
+            }
+        }
     }
 
-    fun createEmailPasswordUser(successCallback: SuccessCallback) {
+    /**
+     * Signs in the user using email and password.
+     */
+    fun signInEmailAndPassword() {
         viewModelScope.launch {
             uiState.value = UIState.Loading()
-            val loginParams =
-                NonSocialLoginParameter(signupData.email, signupData.password, signupData.fullName)
-            // Get data from the repository (IO scope)
-            authInteractor.login(
-                LoginProvider.REGISTER_WITH_EMAIL_AND_PASSWORD,
-                loginParams
-            ) { user, exception ->
-                viewModelScope.launch {
-                    // Switch to Main dispatcher to update the UI
-                    withContext(Dispatchers.Main) {
-                        if (user != null && exception == null) {
-                            getUser()
-                            _signupData.value = signupData.copy(authError = null)
-                            successCallback(true, null)
-                        } else {
-                            uiState.value = UIState.Error(exception?.message)
-                            _signupData.value = signupData.copy(authError = exception?.message)
-                            successCallback(false, exception)
-                        }
-                    }
-                }
+            val loginParams = NonSocialLoginParameter(signInData.email, signInData.password)
+            val result = authInteractor.login(LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD, loginParams) as? SignInResult ?: return@launch
+            when (result) {
+                SignInResult.Cancelled -> setSignInResultState(result, AuthScreenState.Login, null, null)
+                is SignInResult.Failure -> setSignInResultState(result, AuthScreenState.Login, result.errorable?.errorType?.messageKey, null)
+                is SignInResult.NoCredentials -> setSignInResultState(result, AuthScreenState.Login, result.errorable?.errorType?.messageKey, null)
+                is SignInResult.Success -> fetchUserData(AuthScreenState.Login)
             }
         }
     }
 
-    private fun getUser() {
-        authInteractor.getUser { user, exception ->
-            user?.let {
-                uiState.value = UIState.Success(user)
-            } ?: run {
-                uiState.value = UIState.Error(exception?.message)
+    /**
+     * Registers a new user using email, password, and full name.
+     */
+    fun createEmailPasswordUser() {
+        viewModelScope.launch {
+            uiState.value = UIState.Loading()
+            val registerParams = NonSocialLoginParameter(signupData.email, signupData.password, signupData.fullName)
+            val result = authInteractor.login(LoginProvider.REGISTER_WITH_EMAIL_AND_PASSWORD, registerParams) as? SignUpResult ?: return@launch
+            when (result) {
+                SignUpResult.Cancelled -> setSignInResultState(SignInResult.Cancelled, AuthScreenState.Register, null, null)
+                is SignUpResult.Failure -> setSignInResultState(SignInResult.Failure(result.errorable), AuthScreenState.Register, result.errorable?.errorType?.messageKey, null)
+                is SignUpResult.Success -> fetchUserData(AuthScreenState.Register)
             }
         }
     }
 
-    fun signInEmailAndPassword(successCallback: SuccessCallback) {
-        uiState.value = UIState.Loading()
-        val loginParams = NonSocialLoginParameter(signInData.email, signInData.password)
-        // Get data from the repository (IO scope)
-        authInteractor.login(
-            LoginProvider.SIGN_IN_WITH_EMAIL_AND_PASSWORD,
-            loginParams
-        ) { user, exception ->
-            viewModelScope.launch {
-                // Switch to Main dispatcher to update the UI
-                withContext(Dispatchers.Main) {
-                    if (user != null && exception == null) {
-                        getUser()
-                        _signInData.value = signInData.copy(authError = null)
-                        successCallback(true, null)
-                    } else {
-                        uiState.value = UIState.Error(exception?.message)
-                        _signInData.value = signInData.copy(authError = exception?.message)
-                        successCallback(false, exception)
-                    }
-                }
+
+
+    fun signInWithGoogle(googleCredentialAuthParameter: GoogleCredentialAuthParameter) {
+        viewModelScope.launch {
+            val result = authInteractor.login(LoginProvider.GOOGLE_SIGN_IN, googleCredentialAuthParameter) as? SignInResult ?: return@launch
+            when (result) {
+                SignInResult.Cancelled -> setSignInResultState(result, AuthScreenState.Login, null, null)
+                is SignInResult.Failure -> setSignInResultState(result, AuthScreenState.Login, result.errorable?.errorType?.messageKey, null)
+                is SignInResult.NoCredentials -> setSignInResultState(result, AuthScreenState.Login, result.errorable?.errorType?.messageKey, null)
+                is SignInResult.Success -> setSignInResultState(result, null, null, result.user)
             }
         }
     }
 
-    /** This is to set the text after the change in the edit text according to the parameter we change.
-     * This method has direct connection to onEvent() method */
-    fun setText(authTextFieldsEnum: AuthTextFieldsEnum, authScreenState: AuthScreenState): String {
-        return when (authScreenState) {
-            AuthScreenState.Login -> {
-                when (authTextFieldsEnum) {
-                    EMAIL -> signInData.email
-                    PASSWORD -> signInData.password
-                    FULL_NAME -> ""  //do noting in sign in
-                    CONFIRM_PASSWORD -> ""  //do noting in sign in
-                    AuthTextFieldsEnum.FORGOT_PASSWORD -> forgotPasswordMail
-                }
-            }
-
-            AuthScreenState.Register -> {
-                when (authTextFieldsEnum) {
-                    EMAIL -> signupData.email
-                    PASSWORD -> signupData.password
-                    FULL_NAME -> signupData.fullName
-                    CONFIRM_PASSWORD -> signupData.confirmPassword
-                    AuthTextFieldsEnum.FORGOT_PASSWORD -> ""
-                }
-            }
-        }
-    }
-
-    /** check the validation of the edit text according to the AuthTextFieldsEnum */
-    fun validateEditText(
-        authTextFieldsEnum: AuthTextFieldsEnum,
-        authScreenState: AuthScreenState
-    ): Boolean {
-        return when (authScreenState) {
-            AuthScreenState.Login -> {
-                when (authTextFieldsEnum) {
-                    AuthTextFieldsEnum.FORGOT_PASSWORD,
-                    EMAIL -> signInData.isEmailValid
-                    PASSWORD -> signInData.isPasswordValid
-                    FULL_NAME -> false
-                    CONFIRM_PASSWORD -> false
-                }
-            }
-
-            AuthScreenState.Register -> {
-                when (authTextFieldsEnum) {
-                    AuthTextFieldsEnum.FORGOT_PASSWORD,
-                    EMAIL -> signupData.isEmailValid
-
-                    PASSWORD -> signupData.isPasswordValid
-                    FULL_NAME -> signupData.isFullNameValid
-                    CONFIRM_PASSWORD -> signupData.isConfirmPasswordValid
-                }
-            }
-        }
-    }
-
-    /** Change the edit text value to its new value when you type the keyboard */
-    fun onEvent(
-        authTextFieldsEnum: AuthTextFieldsEnum,
-        newValue: String,
-        authScreenState: AuthScreenState
-    ) {
-        when (authScreenState) {
-            AuthScreenState.Login -> {
-                when (authTextFieldsEnum) {
-                    EMAIL -> _signInData.value = signInData.copy(email = newValue)
-                    PASSWORD -> _signInData.value = signInData.copy(password = newValue)
-                    FULL_NAME -> {}
-                    CONFIRM_PASSWORD -> {}
-                    AuthTextFieldsEnum.FORGOT_PASSWORD -> _forgotPasswordMail.value = newValue
-                }
-            }
-
-            AuthScreenState.Register -> {
-                when (authTextFieldsEnum) {
-                    FULL_NAME -> _signupData.value = signupData.copy(fullName = newValue)
-                    EMAIL -> _signupData.value = signupData.copy(email = newValue)
-                    PASSWORD -> _signupData.value = signupData.copy(password = newValue)
-                    CONFIRM_PASSWORD -> _signupData.value =
-                        signupData.copy(confirmPassword = newValue)
-
-                    AuthTextFieldsEnum.FORGOT_PASSWORD -> {}
-                }
-            }
-        }
-    }
-
-    /** Logout fun to use whenever we need to logout
-     * NOTE: meanwhile I use it when I change loginState otherwise we would get permission denied
-     * if we try to sign in or register if we already logged in.
-     * */
+    /**
+     * Logs out the current user.
+     */
     fun logOut() = authInteractor.logOut()
 
+    /**
+     * Resets the password for the given email address.
+     *
+     * @param email The email address to send the reset password link to.
+     */
     fun resetPassword(email: String) {
-        uiState.value = UIState.Loading()
-        authInteractor.resetPassword(email) { success, exception ->
-            if (success && exception == null)
-                uiState.value = UIState.Success(true)
-            else
-                uiState.value = UIState.Error(exception?.message)
+        viewModelScope.launch {
+            authInteractor.resetPassword(email)
+        }
+    }
+
+    /**
+     * Returns the current text value for a specific input field based on the authentication screen state.
+     *
+     * @param authTextFieldsEnum The enum value representing the input field.
+     * @param authScreenState The current authentication screen state.
+     * @return The current text value for the input field.
+     */
+    fun setText(authTextFieldsEnum: AuthTextFieldsEnum, authScreenState: AuthScreenState): String {
+        return when (authScreenState) {
+            AuthScreenState.Login -> when (authTextFieldsEnum) {
+                EMAIL -> signInData.email
+                PASSWORD -> signInData.password
+                FULL_NAME, CONFIRM_PASSWORD -> ""
+                AuthTextFieldsEnum.FORGOT_PASSWORD -> forgotPasswordMail
+            }
+            AuthScreenState.Register -> when (authTextFieldsEnum) {
+                EMAIL -> signupData.email
+                PASSWORD -> signupData.password
+                FULL_NAME -> signupData.fullName
+                CONFIRM_PASSWORD -> signupData.confirmPassword
+                AuthTextFieldsEnum.FORGOT_PASSWORD -> ""
+            }
+        }
+    }
+
+    /**
+     * Validates the input for a specific field based on the authentication screen state.
+     *
+     * @param authTextFieldsEnum The enum value representing the input field.
+     * @param authScreenState The current authentication screen state.
+     * @return `true` if the input is valid, otherwise `false`.
+     */
+    fun validateEditText(authTextFieldsEnum: AuthTextFieldsEnum, authScreenState: AuthScreenState): Boolean {
+        return when (authScreenState) {
+            AuthScreenState.Login -> when (authTextFieldsEnum) {
+                EMAIL -> signInData.isEmailValid
+                PASSWORD -> signInData.isPasswordValid
+                else -> false
+            }
+            AuthScreenState.Register -> when (authTextFieldsEnum) {
+                EMAIL -> signupData.isEmailValid
+                PASSWORD -> signupData.isPasswordValid
+                FULL_NAME -> signupData.isFullNameValid
+                CONFIRM_PASSWORD -> signupData.isConfirmPasswordValid
+                else -> false
+            }
+        }
+    }
+
+    /**
+     * Updates the text value for a specific input field based on the authentication screen state.
+     *
+     * @param authTextFieldsEnum The enum value representing the input field.
+     * @param newValue The new value to set.
+     * @param authScreenState The current authentication screen state.
+     */
+    fun onEvent(authTextFieldsEnum: AuthTextFieldsEnum, newValue: String, authScreenState: AuthScreenState) {
+        when (authScreenState) {
+            AuthScreenState.Login -> when (authTextFieldsEnum) {
+                EMAIL -> signInData = signInData.copy(email = newValue)
+                PASSWORD -> signInData = signInData.copy(password = newValue)
+                AuthTextFieldsEnum.FORGOT_PASSWORD -> forgotPasswordMail = newValue
+                else -> {}
+            }
+            AuthScreenState.Register -> when (authTextFieldsEnum) {
+                FULL_NAME -> signupData = signupData.copy(fullName = newValue)
+                EMAIL -> signupData = signupData.copy(email = newValue)
+                PASSWORD -> signupData = signupData.copy(password = newValue)
+                CONFIRM_PASSWORD -> signupData = signupData.copy(confirmPassword = newValue)
+                else -> {}
+            }
+        }
+    }
+
+    /**
+     * Updates the UI state and sign-in result state based on the authentication result.
+     *
+     * @param signInResult The sign-in result.
+     * @param authScreenState The current authentication screen state.
+     * @param errorMessageKey The error message key, if any.
+     * @param user The user object, if any.
+     */
+    private fun setSignInResultState(
+        signInResult: SignInResult,
+        authScreenState: AuthScreenState?,
+        errorMessageKey: String?,
+        user: User?,
+    ) {
+        if (user != null) uiState.value = UIState.Success(user)
+        else uiState.value = UIState.Error(errorMessageKey)
+
+        this.signInResult.value = signInResult
+
+        authScreenState ?: return
+        when (authScreenState) {
+            AuthScreenState.Login -> signInData.authError = errorMessageKey
+            AuthScreenState.Register -> signupData.authError = errorMessageKey
         }
     }
 }
