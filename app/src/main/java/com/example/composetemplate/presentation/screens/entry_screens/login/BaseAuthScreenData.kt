@@ -8,7 +8,7 @@ import com.example.composetemplate.utils.extensions.isValidPassword
 interface BaseAuthScreenData {
     val email: String
     val password: String
-    val authError: String?
+    var authError: String?
 
     val isEmailValid: Boolean
         get() = email.isValidEmail()
@@ -20,7 +20,7 @@ interface BaseAuthScreenData {
 data class SignInData(
     override val email: String = "",
     override val password: String = "",
-    override val authError:String? = null
+    override var authError:String? = null
 ): BaseAuthScreenData {
     val isValidLoginPage: Boolean
         get() = email.isValidEmail() && password.isValidPassword()
@@ -31,7 +31,7 @@ data class SignUpData(
     override val email: String = "",
     override val password: String = "",
     val confirmPassword: String = "",
-    override val authError:String? = null
+    override var authError:String? = null
 ): BaseAuthScreenData {
 
     val isFullNameValid: Boolean

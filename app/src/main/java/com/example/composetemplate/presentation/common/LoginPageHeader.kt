@@ -1,6 +1,8 @@
 package com.example.composetemplate.presentation.common
 
+import android.app.Activity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,20 +16,26 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.composetemplate.R
+import com.example.composetemplate.data.models.local_models.GoogleCredentialAuthParameter
 import com.example.composetemplate.ui.theme.CustomTheme
 import com.example.composetemplate.utils.Constants.Companion.AUTH_WITH_GOOGLE
+import com.example.composetemplate.presentation.screens.entry_screens.register.AuthViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginPageHeader(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel,
 ) {
+    val activity = LocalContext.current as Activity
+    val scope = rememberCoroutineScope()
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,14 +59,17 @@ fun LoginPageHeader(
                     .weight(1f) // Distribute available space evenly// Adjust size as needed
             )
 
-            // Display the image
             Image(
                 painter = rememberAsyncImagePainter(model = R.drawable.google_login_icon),
                 contentDescription = "Image",
                 modifier = Modifier
                     .size(55.dp)
+                    .clickable {
+                        scope.launch {
+                            authViewModel.signInWithGoogle(GoogleCredentialAuthParameter(activity))
+                        }
+                    }
             )
-
             Text(
                 modifier = modifier
                     .padding(top = 6.dp),

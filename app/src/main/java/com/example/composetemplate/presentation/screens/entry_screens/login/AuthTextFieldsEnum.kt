@@ -8,7 +8,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import com.example.composetemplate.managers.StringsKeyManager.FORGOT_PASSWORD_TEXT
+import com.example.composetemplate.managers.StringsKeyManager.LOGIN_CONFIRM_PASSWORD_PLACEHOLDER
+import com.example.composetemplate.managers.StringsKeyManager.LOGIN_EMAIL_PLACEHOLDER
+import com.example.composetemplate.managers.StringsKeyManager.LOGIN_FULL_NAME_PLACEHOLDER
+import com.example.composetemplate.managers.StringsKeyManager.LOGIN_PASSWORD_PLACEHOLDER
 import com.example.composetemplate.utils.Constants
+import com.example.composetemplate.utils.StringProvider
 
 enum class AuthScreenState {
     Login,
@@ -20,11 +26,11 @@ enum class AuthTextFieldsEnum {
 
     fun getPlaceHolder(): String{
         return when(this) {
-            EMAIL -> Constants.EMAIL_TEXT
-            PASSWORD -> Constants.PASSWORD_TEXT
-            FULL_NAME -> Constants.FULL_NAME_TEXT
-            CONFIRM_PASSWORD -> Constants.CONFIRM_PASSWORD_TEXT
-            FORGOT_PASSWORD -> Constants.FORGOT_PASSWORD_TEXT
+            EMAIL -> StringProvider.getString(LOGIN_EMAIL_PLACEHOLDER)
+            PASSWORD -> StringProvider.getString(LOGIN_PASSWORD_PLACEHOLDER)
+            FULL_NAME -> StringProvider.getString(LOGIN_FULL_NAME_PLACEHOLDER)
+            CONFIRM_PASSWORD -> StringProvider.getString(LOGIN_CONFIRM_PASSWORD_PLACEHOLDER)
+            FORGOT_PASSWORD -> StringProvider.getString(FORGOT_PASSWORD_TEXT)
         }
     }
 
