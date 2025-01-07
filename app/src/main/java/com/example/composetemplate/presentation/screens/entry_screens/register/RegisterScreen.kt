@@ -98,7 +98,6 @@ fun RegisterScreen(
                         },
                         isLastEditText = index == registerFields.size - 1,
                         isFirstEditText = index == 0,
-                        focusRequester = focusRequestList[index],
                         onNextFocusRequest = {
                             if (index < focusRequestList.size - 1) {
                                 focusRequestList[index + 1].requestFocus()

@@ -48,7 +48,6 @@ fun LoginTextField(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .focusRequester(focusRequester ?: FocusRequester())
             .onFocusChanged { focusState ->
                 isFocused = focusState.isFocused
             }
