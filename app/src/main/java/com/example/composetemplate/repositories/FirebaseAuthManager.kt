@@ -15,6 +15,7 @@ import com.example.composetemplate.data.remote.confing.remoteConfigVal
 import com.example.composetemplate.data.remote.errors.AuthError
 import com.example.composetemplate.managers.TokenData
 import com.example.composetemplate.managers.TokenFetcher
+import com.example.composetemplate.managers.TokenManager
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignInResult
 import com.example.composetemplate.presentation.screens.entry_screens.login.SignUpResult
 import com.example.composetemplate.utils.extensions.errorType
@@ -25,6 +26,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import org.json.JSONObject
+import org.koin.java.KoinJavaComponent.inject
 import java.security.MessageDigest
 import java.util.UUID
 import kotlin.coroutines.resume
@@ -106,7 +108,15 @@ class FirebaseAuthManager : AuthActionable, TokenFetcher {
     /**
      * Logs out the current user from Firebase.
      */
-    override fun logout() = auth.signOut()
+    override fun logout() {
+        auth.signOut()
+        clearToken()
+    }
+
+    private fun clearToken() {
+        val tokenManager by inject<TokenManager>(TokenManager::class.java)
+        tokenManager.clearToken()
+    }
 
     /**
      * Sends a password reset email to the user.

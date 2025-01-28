@@ -76,6 +76,11 @@ class TokenManager(private val tokenFetcher: TokenFetcher) {
         expirationTime = newExpirationTime
     }
 
+    fun clearToken() {
+        token = null
+        expirationTime = 0L
+    }
+
     private fun isTokenExpired(): Boolean {
         return System.currentTimeMillis() >= (expirationTime ?: 0L)
     }

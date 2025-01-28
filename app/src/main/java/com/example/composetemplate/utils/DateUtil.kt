@@ -80,6 +80,11 @@ object DateUtil {
         return Clock.System.now().toLocalDateTime(timeZone)
     }
 
+    fun getCurrentDateInMillis(): Long {
+        return Clock.System.now().toEpochMilliseconds()
+    }
+
+
     val currentTimeAsEpochSeconds: Long
         get() = Clock.System.now().epochSeconds
 
